@@ -80,6 +80,13 @@ namespace SharpBoySDL
                 return;
             }
 
+            //Translate to correct RAM Bank
+            if (Address >= 0xA000 && Address < 0xC000)
+            {
+                RAMBanks[(Address - 0xA000) + (CurRAMBank * 0x2000)] = Data;
+                return;
+            }
+
             //Disallowed region
             if ((Address >= 0xFEA0 && Address <= 0xFEFF))
             {
@@ -106,10 +113,27 @@ namespace SharpBoySDL
         public void HandleBanks(int Address, byte Data)
         {
             //Handle RAM Bank switch
-            if (Address < 0x2000 && (RAMMapper == Mapper.MBC1 || RAMMapper == Mapper.MBC2))
+            if (Address < 0x2000)
             {
-                EnableRAMBank(Address, Data);
+                if (RAMMapper == Mapper.MBC1 || RAMMapper == Mapper.MBC2)
+                {
+                    EnableRAMBank(Address, Data);
+                }
+                return;
             }
+
+            //Handle ROM Bank switch
+            if (Address >= 0x2000 && Address < 0x4000)
+            {
+                if (RAMMapper == Mapper.MBC1 || RAMMapper == Mapper.MBC2)
+                {
+                    SwitchLoROMBank(Data);
+                }
+
+                return;
+            }
+
+            
             
         }
 
@@ -132,6 +156,10 @@ namespace SharpBoySDL
             {
                 EnableRAM = false;
             }
+        }
+
+        public void SwitchLoROMBank(byte Data)
+        {
         }
 
         /// <summary>
