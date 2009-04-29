@@ -60,6 +60,13 @@ namespace Sharp8.Properties {
             }
         }
         
+        internal static System.Drawing.Icon AppIcon {
+            get {
+                object obj = ResourceManager.GetObject("AppIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
         internal static System.IO.UnmanagedMemoryStream beep {
             get {
                 return ResourceManager.GetStream("beep", resourceCulture);
