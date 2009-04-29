@@ -30,23 +30,43 @@ namespace Sharp8_V3
         {
             InitializeComponent();
 
+            //Emulator component.
             Emu = new Emulator();
+
+            //Register Tick Handler. This event is raised every frame by SDL.
             SdlDotNet.Core.Events.Tick += new EventHandler<TickEventArgs>(Events_Tick);
+
+            //Set the FPS that SDL will try to match.
             TargetFPS = 60;
-            SdlDotNet.Core.Events.Fps = 60;
+            SdlDotNet.Core.Events.Fps = TargetFPS;
+
+            //This delegate allows the debugger to redraw the output window after every step. (Normally it is just done once a frame)
             UpdateDisplayDel = new VoidNoParams(UpdateDisplay);
+
+            //Ready the input handler and attach it to the emulator
             InpHand = new InputHandler();
+            Emu.AttachInputHandler(InpHand);
             this.KeyDown += new KeyEventHandler(InpHand.KeyDown);
             this.KeyUp += new KeyEventHandler(InpHand.KeyUp);
-            Emu.AttachInputHandler(InpHand);
+            
+            //Attach the input handler to the input mapper form
             InputMapper = new InputMapperForm(InpHand);
+
+            //Attach the redraw delegate to the debugger
             Debugger = new DebuggerForm(Emu,UpdateDisplayDel);
+
+            //Create a "NumericInput" form. This is used to get the Target FPS when the user wants to change it.
             NumInp = new NumericInputFrom();
             NumInp.Title = "Target FPS";
             
         }
         
         #region Eventhandlers
+        /// <summary>
+        /// This event is called when clicking the Open ROM menu item
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void openROMToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (ofdGetROM.ShowDialog() == DialogResult.OK) //If the user actually *chose* a file...
@@ -68,8 +88,14 @@ namespace Sharp8_V3
             }
         }
 
+        /// <summary>
+        /// This event is called when clicking the Exit menu item.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //Close down SDLDotNet
             SdlDotNet.Core.Events.Close();
             SdlDotNet.Core.Events.QuitApplication();
             Application.Exit();
@@ -102,6 +128,11 @@ namespace Sharp8_V3
             }
         }
 
+        /// <summary>
+        /// This event handler is called if the main windw is closed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             SdlDotNet.Core.Events.Close();
@@ -109,6 +140,11 @@ namespace Sharp8_V3
             Application.Exit();
         }
 
+        /// <summary>
+        /// This event handler is called when clicking the Reset With Debugger menu item.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void resetWithDebuggerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Debugger == null || Debugger.IsDisposed) //Just in case the debugger was dismissed with the close button.
@@ -121,6 +157,11 @@ namespace Sharp8_V3
             UpdateDisplay();
         }
 
+        /// <summary>
+        /// This event handler is called when clicking the Pause And Open Debugger menu item.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void pauseAndOpenDebuggerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Debugger == null || Debugger.IsDisposed) //Just in case the debugger was dismissed with the close button.
@@ -131,6 +172,12 @@ namespace Sharp8_V3
             Debugger.UpdateInfo();
             Debugger.Show();
         }
+
+        /// <summary>
+        /// This event handler is called when clicking the Map Input menu item.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void mapinputToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (InputMapper == null  || InputMapper.IsDisposed) //Just in case the input mapper was dismissed with the close button.
@@ -144,6 +191,11 @@ namespace Sharp8_V3
 
         }
 
+        /// <summary>
+        /// This event handler is called when clicking the Target FPS menu item.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void targetFPSToolStripMenuItem_Click(object sender, EventArgs e)
         {
             NumInp.Value = TargetFPS;
@@ -157,17 +209,30 @@ namespace Sharp8_V3
             Emu.IsPaused = false;
         }
 
+        /// <summary>
+        /// This event handler is called when clicking the Play Sound menu item.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void playSoundToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Emu.UseSound = playSoundToolStripMenuItem.Checked;
         }
 
+        /// <summary>
+        /// This event handler is called when clicking the Reset menu item.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void resetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Emu.Reset();
         }
         #endregion
 
+        /// <summary>
+        /// Force the redraw of the Display SDLSurface control.
+        /// </summary>
         private void UpdateDisplay()
         {
             scDisplay.Blit(Emu.SurfaceOut);

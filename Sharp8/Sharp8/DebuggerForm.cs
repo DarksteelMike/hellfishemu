@@ -60,6 +60,7 @@ namespace Sharp8_V3
             ushort PC = AttachedEmulator.Memory.ReadWord(AttachedEmulator.ProgramCounter);
             tbCurrentOpcode.Text = Convert.ToString((int)PC, 16).PadLeft(4, '0').ToUpper();
             lblOpcodeDescription.Text = OpcodeMeaning(PC);
+            lblMode.Text = AttachedEmulator.IsInSCHIPMode ? "SCHIP" : "CHIP8";
 
             lbProgramStack.Items.Clear();
             foreach (ushort entry in AttachedEmulator.ProgramStack)

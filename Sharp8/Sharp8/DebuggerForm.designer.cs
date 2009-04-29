@@ -79,6 +79,8 @@ namespace Sharp8_V3
             this.lblUIMemory = new System.Windows.Forms.Label();
             this.lblOpcodeDescription = new System.Windows.Forms.Label();
             this.bReset = new System.Windows.Forms.Button();
+            this.lblUIMode = new System.Windows.Forms.Label();
+            this.lblMode = new System.Windows.Forms.Label();
             this.grpbRegisters.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -577,11 +579,30 @@ namespace Sharp8_V3
             this.bReset.UseVisualStyleBackColor = true;
             this.bReset.Click += new System.EventHandler(this.bReset_Click);
             // 
+            // lblUIMode
+            // 
+            this.lblUIMode.AutoSize = true;
+            this.lblUIMode.Location = new System.Drawing.Point(255, 300);
+            this.lblUIMode.Name = "lblUIMode";
+            this.lblUIMode.Size = new System.Drawing.Size(37, 13);
+            this.lblUIMode.TabIndex = 52;
+            this.lblUIMode.Text = "Mode:";
+            // 
+            // lblMode
+            // 
+            this.lblMode.AutoSize = true;
+            this.lblMode.Location = new System.Drawing.Point(298, 300);
+            this.lblMode.Name = "lblMode";
+            this.lblMode.Size = new System.Drawing.Size(0, 13);
+            this.lblMode.TabIndex = 53;
+            // 
             // DebuggerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(483, 323);
+            this.Controls.Add(this.lblMode);
+            this.Controls.Add(this.lblUIMode);
             this.Controls.Add(this.bReset);
             this.Controls.Add(this.lblOpcodeDescription);
             this.Controls.Add(this.lblUIMemory);
@@ -664,5 +685,7 @@ namespace Sharp8_V3
         private System.Windows.Forms.Label lblUIMemory;
         private System.Windows.Forms.Label lblOpcodeDescription;
         private System.Windows.Forms.Button bReset;
+        private System.Windows.Forms.Label lblUIMode;
+        private System.Windows.Forms.Label lblMode;
     }
 }

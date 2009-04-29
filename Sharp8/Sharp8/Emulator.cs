@@ -530,7 +530,21 @@ namespace Sharp8_V3
         private bool Do00CN()
         {
             //00CN: Scroll down N lines
-            //TODO: Implement
+            for (int y = 63; y >= 0; y--)
+            {
+                for (int x = 0; x < 128; x++)
+                {
+                    if (y >= FourthNibble)
+                    {
+                        ScreenData[x, y] = ScreenData[x, y - FourthNibble];
+                    }
+                    else
+                    {
+                        ScreenData[x, y] = false;
+                    }
+                }
+            }
+            ScreenDataToSurface();
             return true;
         }
         private bool Do00E0()
@@ -556,20 +570,89 @@ namespace Sharp8_V3
         }
         private bool Do00FB()
         {
-            //00FB: Scroll 4 pixels right (2 if not in SCHIP mode)
-            //TODO: Implement
+            //00FC: Scroll 4 pixels right (2 if not in SCHIP mode)
+            if (isInSCHIPMode)
+            {
+                for (int x = 0; x < 128; x++)
+                {
+                    for (int y = 0; y < 64; y++)
+                    {
+                        if (x >= 4)
+                        {
+                            ScreenData[x, y] = ScreenData[x - 4, y];
+                        }
+                        else
+                        {
+                            ScreenData[x, y] = false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int x = 63; x >= 0; x--)
+                {
+                    for (int y = 0; y < 32; y++)
+                    {
+                        if (x >= 2)
+                        {
+                            ScreenData[x, y] = ScreenData[x - 2, y];
+                        }
+                        else
+                        {
+                            ScreenData[x, y] = false;
+                        }
+                    }
+                }
+            }
+            ScreenDataToSurface();
             return true;
         }
         private bool Do00FC()
         {
-            //00FC: Scroll 4 pixels left (2 if not in SCHIP mode)
-            //TODO: Implement
+            //00FB: Scroll 4 pixels left (2 if not in SCHIP mode)
+            if (isInSCHIPMode)
+            {
+                for (int x = 0; x < 128; x++)
+                {
+                    for (int y = 0; y < 64; y++)
+                    {
+                        if (x <= 123)
+                        {
+                            ScreenData[x, y] = ScreenData[x + 4, y];
+                        }
+                        else
+                        {
+                            ScreenData[x, y] = false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int x = 0; x < 64; x++)
+                {
+                    for (int y = 0; y < 32; y++)
+                    {
+                        if (x <= 61)
+                        {
+                            ScreenData[x, y] = ScreenData[x + 2, y];
+                        }
+                        else
+                        {
+                            ScreenData[x, y] = false;
+                        }
+                    }
+                }
+            }
+            ScreenDataToSurface();
             return true;
         }
         private bool Do00FD()
         {
             //00FD: Quite the emulator
             System.Windows.Forms.MessageBox.Show("Quit by opcode!");
+            Reset();
             isPaused = true;
             return false;
         }
@@ -918,5 +1001,41 @@ namespace Sharp8_V3
             return false;
         }
         #endregion
+
+        /// <summary>
+        /// Draws the screen data to the output surface.
+        /// </summary>
+        private void ScreenDataToSurface()
+        {
+            surfaceOut.Fill(Color.Black);
+            if (isInSCHIPMode)
+            {
+                for (int x = 0; x < 128; x++)
+                {
+                    for (int y = 0; y < 64; y++)
+                    {
+                        if (ScreenData[x, y])
+                        {
+                            surfaceOut.Blit(SCHIPPixelW, new Point(x * 5, y * 5));
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int x = 0; x < 64; x++)
+                {
+                    for (int y = 0; y < 32; y++)
+                    {
+                        if (ScreenData[x, y])
+                        {
+                            surfaceOut.Blit(PixelW, new Point(x * 10, y * 10));
+                        }
+                    }
+                }
+            }
+
+            surfaceOut.Update();
+        }
     }
 }
