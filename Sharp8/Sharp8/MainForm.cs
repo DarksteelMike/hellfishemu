@@ -56,6 +56,7 @@ namespace Sharp8_V3
                 byte[] OpenedROM = new byte[FSROM.Length];
                 FSROM.Read(OpenedROM, 0, (int)FSROM.Length);
                 Emu.LoadROM(OpenedROM);
+                Emu.Reset();
 
                 //Enable FPS display and debugger
                 LastFPSCalc = SdlDotNet.Core.Timer.TicksElapsed;

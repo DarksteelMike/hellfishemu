@@ -160,6 +160,7 @@ namespace Sharp8_V3
         private Surface PixelB, PixelW, SCHIPPixelB, SCHIPPixelW;
         private SdlDotNet.Audio.Sound BeepSound;
         private SdlDotNet.Audio.Channel BeepChan;
+        private bool SoundStartedThisFrame;
         #endregion
 
         #region Constructors
@@ -186,7 +187,9 @@ namespace Sharp8_V3
         private void Init()
         {
             useSound = true;
-            BeepSound = new SdlDotNet.Audio.Sound(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\') + 1) + "beep.wav");
+            byte[] BeepData = new byte[Sharp8.Properties.Resources.beep.Length];
+            Sharp8.Properties.Resources.beep.Read(BeepData, 0, (int)Sharp8.Properties.Resources.beep.Length);
+            BeepSound = new SdlDotNet.Audio.Sound(BeepData);
             BeepChan = BeepSound.Play(true);
             BeepChan.Pause();
             memory = new MemoryHandler();
@@ -219,6 +222,7 @@ namespace Sharp8_V3
 
         public void Reset()
         {
+            SoundStartedThisFrame = false;
             memory.Clear();
             if (currentROM != null)
             {
@@ -255,10 +259,7 @@ namespace Sharp8_V3
         /// <returns>True if the display surface has changed and needs updating. False otherwise.</returns>
         public bool DoOneFrame()
         {
-            if (useSound && soundTimer > 0)
-            {
-                BeepChan.Resume();
-            }
+            SoundStartedThisFrame = false;
             bool DoSurfaceUpdate = false;
             for (int i = 0; i < OPCODESPERFRAME; i++)
             {
@@ -270,11 +271,6 @@ namespace Sharp8_V3
                        return DoSurfaceUpdate;
                     }
                 }
-            }
-
-            if (BeepChan.IsPlaying())
-            {
-                BeepChan.Pause();
             }
 
             return DoSurfaceUpdate;
@@ -289,6 +285,11 @@ namespace Sharp8_V3
                 if (soundTimer > 0)
                 {
                     soundTimer--;
+                    if (useSound && !SoundStartedThisFrame)
+                    {
+                        BeepChan.Play(BeepSound);
+                        SoundStartedThisFrame = true;
+                    }
                 }
                 if (delayTimer > 0)
                 {
