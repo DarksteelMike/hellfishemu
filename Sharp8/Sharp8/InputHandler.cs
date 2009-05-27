@@ -74,6 +74,7 @@ namespace Sharp8_V3
             {
                 if (SR.EndOfStream)
                 {
+                    MessageBox.Show("An error was encountered while loading the key mappings. \n They will be reverted to the default mappings.");
                     SetDefaultMappings();
                     SaveMappings();
                     break;
@@ -84,6 +85,7 @@ namespace Sharp8_V3
                 }
                 catch (ArgumentException AE)
                 {
+                    MessageBox.Show("An error was encountered while loading the key mappings. \n They will be reverted to the default mappings.");
                     SetDefaultMappings();
                     SaveMappings();
                     break;
