@@ -16,12 +16,11 @@ namespace Sharp8_V3
         #region Member variables
         private Emulator Emu;
         private int LastFPSCalc;
-        private int FramesDone;
         private DebuggerForm Debugger;
         private InputMapperForm InputMapper;
         private InputHandler InpHand;
         private NumericInputFrom NumInp;
-        private int TargetFPS;
+        private int TargetRenderFPS;
         
         private VoidNoParams UpdateDisplayDel;
         #endregion
@@ -37,8 +36,11 @@ namespace Sharp8_V3
             SdlDotNet.Core.Events.Tick += new EventHandler<TickEventArgs>(Events_Tick);
 
             //Set the FPS that SDL will try to match.
-            TargetFPS = 60;
-            SdlDotNet.Core.Events.Fps = TargetFPS;
+            TargetRenderFPS = 60;
+            SdlDotNet.Core.Events.Fps = TargetRenderFPS;
+
+            //Set the FPS at which the Tick event must be raised.
+            SdlDotNet.Core.Events.TargetFps = 60;
 
             //This delegate allows the debugger to redraw the output window after every step. (Normally it is just done once a frame)
             UpdateDisplayDel = new VoidNoParams(UpdateDisplay);
@@ -113,10 +115,6 @@ namespace Sharp8_V3
             {
                 this.Text = "Sharp8 - FPS: " + SdlDotNet.Core.Events.Fps;
                 LastFPSCalc = SdlDotNet.Core.Timer.TicksElapsed;
-            }
-            else
-            {
-                FramesDone++;
             }
 
             if (!Emu.IsPaused) //If the debugger hasn't paused the emulator...
@@ -198,13 +196,13 @@ namespace Sharp8_V3
         /// <param name="e"></param>
         private void targetFPSToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            NumInp.Value = TargetFPS;
+            NumInp.Value = TargetRenderFPS;
             Emu.IsPaused = true;
             if (NumInp.ShowDialog() == DialogResult.OK)
             {
-                TargetFPS = NumInp.Value;
-                SdlDotNet.Core.Events.Fps = TargetFPS;
-                targetFPSToolStripMenuItem.Text = "Target FPS: " + TargetFPS.ToString();
+                TargetRenderFPS = NumInp.Value;
+                SdlDotNet.Core.Events.Fps = TargetRenderFPS;
+                targetFPSToolStripMenuItem.Text = "Target FPS: " + TargetRenderFPS.ToString();
             }
             Emu.IsPaused = false;
         }
