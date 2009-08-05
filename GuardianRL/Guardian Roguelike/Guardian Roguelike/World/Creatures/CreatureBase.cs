@@ -8,6 +8,12 @@ namespace Guardian_Roguelike.World.Creatures
     {
         //Stats
         public int HP;
+        public int MaxHP;
+        public int BaseVigor;
+        public int BaseEnergy;
+        public int BaseSpeed;
+        public int BaseAim;
+        public int BaseStrength;
 
         //Drawing stuff
         public System.Drawing.Point LocalPos;

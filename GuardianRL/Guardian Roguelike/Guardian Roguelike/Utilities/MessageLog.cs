@@ -25,12 +25,17 @@ namespace Guardian_Roguelike.Utilities
             {
                 Lines[Lines.Count - 1] += Msg;
             }
-            if (Lines[Lines.Count - 1].Length > 90)
+            while (Lines[Lines.Count - 1].Length > 90)
             {
                 string NewLine = Lines[Lines.Count - 1].Substring(89);
                 Lines[Lines.Count - 1] = Lines[Lines.Count - 1].Substring(0, 89);
                 Lines.Add(NewLine);
 
+            }
+
+            while (Lines.Count > 90)
+            {
+                Lines.RemoveAt(0);
             }
         }
         public void RenderRecentToConsole(libtcodWrapper.Console Target)

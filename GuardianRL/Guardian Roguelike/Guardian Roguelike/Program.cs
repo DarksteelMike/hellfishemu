@@ -18,8 +18,10 @@ namespace Guardian_Roguelike
             libtcodWrapper.RootConsole.WindowTitle = "Guardian RL";
 
             States.StateManager.PersistentStates.Add("MainMenuState", new States.MainMenuState());
+            States.StateManager.PersistentStates.Add("WorldMapMenuState", new States.WorldMapMenuState());
             States.StateManager.PersistentStates.Add("GameState", new States.MainMenuState());
             States.StateManager.PersistentStates.Add("QuitState", new States.MainMenuState());
+            //States.StateManager.PersistentStates.Add("MessageLogMenuState",);
             
             States.StateManager.ChangeState(States.StateManager.PersistentStates["MainMenuState"]);
         }

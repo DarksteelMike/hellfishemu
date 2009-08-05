@@ -15,6 +15,8 @@ namespace Guardian_Roguelike.States
         private Utilities.MessageLog MsgLog;
         private libtcodWrapper.Console MsgCons;
 
+        private States.StateBase FollowingState;
+
         public override void EnterState()
         {
             if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_MessageLog"))
@@ -64,7 +66,7 @@ namespace Guardian_Roguelike.States
                 }
             }
 
-            StateManager.QueueState(new MainMenuState());
+            StateManager.QueueState(FollowingState);
         }
 
         private void Render()
@@ -179,6 +181,7 @@ namespace Guardian_Roguelike.States
                      * */
                     break;                    
                 case(libtcodWrapper.KeyCode.TCODK_ESCAPE):
+                    FollowingState = States.StateManager.PersistentStates["MainMenuState"];
                     return true;
                     break;
             }
@@ -189,7 +192,11 @@ namespace Guardian_Roguelike.States
                     MsgLog.AddMsg("Debug!");
                     break;
                 case('m'):
-                    StateManager.QueueState(StateManager.PersistentStates["MessageLogMenuState"]);
+                    FollowingState = StateManager.PersistentStates["MessageLogMenuState"];
+                    return true;
+                    break;
+                case('w'):
+                    FollowingState = StateManager.PersistentStates["WorldMapMenuState"];
                     return true;
                     break;
                 case('s'):

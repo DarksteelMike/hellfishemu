@@ -10,17 +10,22 @@ namespace Guardian_Roguelike.World
         public const int WORLDHEIGHT = 30;
 
         public Map[,] LocalMaps;
+        public char[,] FullWorldMap;
 
         public WorldMap()
         {
             LocalMaps = new Map[WORLDWIDTH, WORLDHEIGHT];
+            FullWorldMap = new char[WORLDWIDTH, WORLDHEIGHT];
             for (int x = 0; x < WORLDWIDTH; x++)
             {
                 for (int y = 0; y < WORLDHEIGHT; y++)
                 {
                     LocalMaps[x, y] = new Map();
+                    FullWorldMap[x, y] = LocalMaps[x, y].GetWorldMapRepresentation();
                 }
             }
+
+            
         }
 
         public void RenderToConsole(libtcodWrapper.Console Target)
@@ -29,7 +34,7 @@ namespace Guardian_Roguelike.World
             {
                 for (int y = 0; y < WORLDHEIGHT; y++)
                 {
-                    Target.PutChar(x, y, LocalMaps[x,y].GetWorldMapRepresentation());
+                    Target.PutChar(x, y, FullWorldMap[x,y]);
                 }
             }
         }
