@@ -132,9 +132,6 @@ namespace SharpBoySDL
 
                 return;
             }
-
-            
-            
         }
 
         public void EnableRAMBank(int Address, byte Data)
@@ -160,6 +157,7 @@ namespace SharpBoySDL
 
         public void SwitchLoROMBank(byte Data)
         {
+            //Codeslinger, damnit!
         }
 
         /// <summary>
