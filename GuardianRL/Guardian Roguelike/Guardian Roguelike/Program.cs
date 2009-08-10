@@ -19,9 +19,9 @@ namespace Guardian_Roguelike
 
             States.StateManager.PersistentStates.Add("MainMenuState", new States.MainMenuState());
             States.StateManager.PersistentStates.Add("WorldMapMenuState", new States.WorldMapMenuState());
-            States.StateManager.PersistentStates.Add("GameState", new States.MainMenuState());
+            States.StateManager.PersistentStates.Add("GameState", new States.GameState());
             States.StateManager.PersistentStates.Add("QuitState", new States.MainMenuState());
-            //States.StateManager.PersistentStates.Add("MessageLogMenuState",);
+            States.StateManager.PersistentStates.Add("MessageLogMenuState",new States.MessageLogMenuState());
             
             States.StateManager.ChangeState(States.StateManager.PersistentStates["MainMenuState"]);
         }

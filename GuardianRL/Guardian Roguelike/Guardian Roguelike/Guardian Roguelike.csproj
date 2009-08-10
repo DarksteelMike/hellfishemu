@@ -60,10 +60,12 @@
     <Compile Include="States\CreateCharacterMenuState.cs" />
     <Compile Include="States\GameState.cs" />
     <Compile Include="States\MainMenuState.cs" />
+    <Compile Include="States\MessageLogMenuState.cs" />
     <Compile Include="States\QuitState.cs" />
     <Compile Include="States\StateBase.cs" />
     <Compile Include="States\StateManager.cs" />
     <Compile Include="States\WorldMapMenuState.cs" />
+    <Compile Include="Utilities\GeneralMethods.cs" />
     <Compile Include="Utilities\InterStateResources.cs" />
     <Compile Include="Utilities\MessageLog.cs" />
     <Compile Include="World\Creatures\CreatureBase.cs" />

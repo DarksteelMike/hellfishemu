@@ -6,7 +6,7 @@ namespace Guardian_Roguelike.Utilities
 {
     public enum MessageLogScrollPossibilities{ None,Up,Down,Both };
 
-    class MessageLog
+    public class MessageLog
     {
         private List<string> Lines;
 

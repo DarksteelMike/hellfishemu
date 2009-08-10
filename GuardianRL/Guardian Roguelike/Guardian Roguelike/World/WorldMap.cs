@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Guardian_Roguelike.World
 {
-    class WorldMap
+    public class WorldMap
     {
         public const int WORLDWIDTH = 90;
         public const int WORLDHEIGHT = 30;
@@ -41,7 +41,7 @@ namespace Guardian_Roguelike.World
 
         public bool CheckWalkable(System.Drawing.Point GlobalPos, System.Drawing.Point LocalPos)
         {
-            return LocalMaps[GlobalPos.X, GlobalPos.Y].GetWalkable(LocalPos);
+            return LocalMaps[GlobalPos.X, GlobalPos.Y].CheckWalkable(LocalPos);
         }
 
         public void MoveCreature(World.Creatures.CreatureBase Subject,World.Map From, World.Map To)

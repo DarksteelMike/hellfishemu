@@ -6,8 +6,7 @@ namespace Guardian_Roguelike.States
 {
     class GameState : StateBase
     {
-        private World.WorldMap CurrentWorld;
-        private World.Map CurrentLocalMap;
+        private World.Map CurrentLevel;
         private libtcodWrapper.Console MapCons;
 
         private World.Creatures.Guardian Player;
@@ -15,38 +14,37 @@ namespace Guardian_Roguelike.States
         private Utilities.MessageLog MsgLog;
         private libtcodWrapper.Console MsgCons;
 
-        private States.StateBase FollowingState;
-
         public override void EnterState()
         {
             if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_MessageLog"))
             {
                 Utilities.InterStateResources.Instance.Resources.Add("Game_MessageLog", new Utilities.MessageLog());
             }
-            if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_WorldMap"))
+            if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_CurrentLevel"))
             {
-                Utilities.InterStateResources.Instance.Resources.Add("Game_WorldMap", new World.WorldMap());
+                Utilities.InterStateResources.Instance.Resources.Add("Game_CurrentLevel", new World.Map());
             }
             if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_PlayerCreature"))
             {
                 World.Creatures.Guardian tPlayer = new Guardian_Roguelike.World.Creatures.Guardian();
                 tPlayer.HP = 100;
-                tPlayer.LocalPos.X = tPlayer.LocalPos.Y = 1;
-                tPlayer.GlobalPos.X = tPlayer.GlobalPos.Y = 0;
+                tPlayer.Position.X = tPlayer.Position.Y = 1;
                 tPlayer.Name = "Spartacus";
                 tPlayer.DrawColor = libtcodWrapper.ColorPresets.ForestGreen;
                 Utilities.InterStateResources.Instance.Resources.Add("Game_PlayerCreature", tPlayer);
             }
+            
             MapCons = libtcodWrapper.RootConsole.GetNewConsole(90, 30);
-            CurrentWorld = (World.WorldMap)Utilities.InterStateResources.Instance.Resources["Game_WorldMap"];
 
             MsgCons = libtcodWrapper.RootConsole.GetNewConsole(90, 5);
             MsgLog = (Utilities.MessageLog)Utilities.InterStateResources.Instance.Resources["Game_MessageLog"];
 
             Player = (World.Creatures.Guardian)Utilities.InterStateResources.Instance.Resources["Game_PlayerCreature"];
 
-            CurrentLocalMap = CurrentWorld.LocalMaps[Player.GlobalPos.X, Player.GlobalPos.Y];
-            CurrentLocalMap.Creatures.Add(Player);
+            CurrentLevel = (World.Map)Utilities.InterStateResources.Instance.Resources["Game_CurrentLevel"];
+            CurrentLevel.Creatures.Add(Player);
+
+            Player.Position = CurrentLevel.GetFirstWalkable();
 
             MsgLog.AddMsg("Welcome to Guardian, " + Player.Name + "!");
         }
@@ -56,8 +54,9 @@ namespace Guardian_Roguelike.States
             libtcodWrapper.KeyPress key;
             while (true)
             {
+                AI();
                 Render();
-
+                
                 key = libtcodWrapper.Keyboard.WaitForKeyPress(true);
 
                 if (ProcessInput(key))
@@ -65,8 +64,6 @@ namespace Guardian_Roguelike.States
                     break;
                 }
             }
-
-            StateManager.QueueState(FollowingState);
         }
 
         private void Render()
@@ -75,113 +72,54 @@ namespace Guardian_Roguelike.States
             MsgLog.RenderRecentToConsole(MsgCons);
             MsgCons.Blit(0, 0, 90, 5, Root, 0, 0);
 
-            CurrentLocalMap = CurrentWorld.LocalMaps[Player.GlobalPos.X, Player.GlobalPos.Y];
-
-            CurrentLocalMap.RenderToConsole(MapCons);
+            CurrentLevel.RenderToConsole(MapCons);
 
             MapCons.Blit(0, 0, 90, 30, Root, 1, 5);
 
             Root.Flush();
         }
 
+        private void AI()
+        {
+            foreach (World.Creatures.CreatureBase c in CurrentLevel.Creatures)
+            {
+                if (c != Player)
+                {
+                    c.AI();
+                }
+            }
+        }
+
         private bool ProcessInput(libtcodWrapper.KeyPress KP)
         {
             switch (KP.KeyCode)
             {
+                case(libtcodWrapper.KeyCode.TCODK_HOME):
+                    Player.MoveUpLeft();
+                    break;
                 case(libtcodWrapper.KeyCode.TCODK_UP):
                     Player.MoveUp();
-                    /*
-                    if (Player.LocalPos.Y == 0)
-                    {
-                        Player.LocalPos.Y = 30;
-                        if (Player.GlobalPos.Y == 0)
-                        {
-                            Player.GlobalPos.Y = 29;
-                        }
-                        else
-                        {
-                            Player.GlobalPos.Y--;
-                        }
-                        MsgLog.AddMsg("Moved in world: " + Player.GlobalPos);
-                    }
-                    if (CurrentLocalMap.GetWalkable(Player.LocalPos.X, Player.LocalPos.Y - 1))
-                    {
-                        Player.LocalPos.Y--;
-                        MsgLog.AddMsg("Moved in local: " + Player.LocalPos);
-                    }
-                     * */
+                    break;
+                case(libtcodWrapper.KeyCode.TCODK_PAGEUP):
+                    Player.MoveUpRight();
+                    break;
+                case (libtcodWrapper.KeyCode.TCODK_RIGHT):
+                    Player.MoveRight();
+                    break; 
+                case(libtcodWrapper.KeyCode.TCODK_PAGEDOWN):
+                    Player.MoveDownRight();
                     break;
                 case(libtcodWrapper.KeyCode.TCODK_DOWN):
                     Player.MoveDown();
-                    /*
-                    if (Player.LocalPos.Y == 29)
-                    {
-                        Player.LocalPos.Y = -1;
-                        if (Player.GlobalPos.Y == 29)
-                        {
-                            Player.GlobalPos.Y = 0;
-                        }
-                        else
-                        {
-                            Player.GlobalPos.Y++;
-                        }
-                        MsgLog.AddMsg("Moved in world: " + Player.GlobalPos);
-                    }
-                    if (CurrentLocalMap.GetWalkable(Player.LocalPos.X, Player.LocalPos.Y + 1))
-                    {
-                        Player.LocalPos.Y++;
-                        MsgLog.AddMsg("Moved in local: " + Player.LocalPos);
-                    }
-                     * */
+                    break;
+                case(libtcodWrapper.KeyCode.TCODK_END):
+                    Player.MoveDownLeft();
                     break;
                 case(libtcodWrapper.KeyCode.TCODK_LEFT):
                     Player.MoveLeft();    
-                    /*
-                    if (Player.LocalPos.X == 0)
-                    {
-                        Player.LocalPos.X = 89;
-                        if (Player.GlobalPos.X == 0)
-                        {
-                            Player.GlobalPos.X = 89;
-                        }
-                        else
-                        {
-                            Player.GlobalPos.X--;
-                        }
-                        MsgLog.AddMsg("Moved in world: " + Player.GlobalPos);
-                    }
-                    if (CurrentLocalMap.GetWalkable(Player.LocalPos.X - 1, Player.LocalPos.Y))
-                    {
-                        Player.LocalPos.X--;
-                        MsgLog.AddMsg("Moved in local: " + Player.LocalPos);
-                    }
-                    */
-                    break;
-                case(libtcodWrapper.KeyCode.TCODK_RIGHT):
-                    Player.MoveRight();
-                    /*
-                    if (Player.LocalPos.X == 89)
-                    {
-                        Player.LocalPos.X = 0;
-                        if (Player.GlobalPos.X == 89)
-                        {
-                            Player.GlobalPos.X = 0;
-                        }
-                        else
-                        {
-                            Player.GlobalPos.X++;
-                        }
-                        MsgLog.AddMsg("Moved in world: " + Player.GlobalPos);
-                    }
-                    if (CurrentLocalMap.GetWalkable(Player.LocalPos.X + 1, Player.LocalPos.Y))
-                    {
-                        Player.LocalPos.X++;
-                        MsgLog.AddMsg("Moved in local: " + Player.LocalPos);
-                    }
-                     * */
-                    break;                    
+                    break;                                   
                 case(libtcodWrapper.KeyCode.TCODK_ESCAPE):
-                    FollowingState = States.StateManager.PersistentStates["MainMenuState"];
+                    StateManager.QueueState(StateManager.PersistentStates["MainMenuState"]);
                     return true;
                     break;
             }
@@ -192,15 +130,15 @@ namespace Guardian_Roguelike.States
                     MsgLog.AddMsg("Debug!");
                     break;
                 case('m'):
-                    FollowingState = StateManager.PersistentStates["MessageLogMenuState"];
+                    StateManager.QueueState(StateManager.PersistentStates["MessageLogMenuState"]);
                     return true;
                     break;
                 case('w'):
-                    FollowingState = StateManager.PersistentStates["WorldMapMenuState"];
+                    StateManager.QueueState(StateManager.PersistentStates["WorldMapMenuState"]);
                     return true;
                     break;
                 case('s'):
-                    CurrentWorld.DEBUG_SaveMap(Player.GlobalPos);
+                    CurrentLevel.DEBUG_Savemap("dbg.txt");
                     break;
             }
 

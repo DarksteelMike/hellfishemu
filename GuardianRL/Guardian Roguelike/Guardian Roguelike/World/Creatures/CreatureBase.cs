@@ -4,7 +4,11 @@ using System.Text;
 
 namespace Guardian_Roguelike.World.Creatures
 {
-    class CreatureBase
+    public enum CreatureTypes { Guardian, Human, Sheep };
+    public enum Deity { Earth, Wind, Fire, Water, Pagan };
+    public enum AIState { Wandering, Tracking, Attacking, Fleeing };
+
+    public abstract class CreatureBase
     {
         //Stats
         public int HP;
@@ -16,157 +20,129 @@ namespace Guardian_Roguelike.World.Creatures
         public int BaseStrength;
 
         //Drawing stuff
-        public System.Drawing.Point LocalPos;
-        public System.Drawing.Point GlobalPos;
+        public System.Drawing.Point Position;
         public libtcodWrapper.Color DrawColor;
         public char CharRepresentation;
 
         //Internal Stuffis
-        private WorldMap World;
-        private Utilities.MessageLog Log;
+        protected Map Level;
+        protected Utilities.MessageLog Log;
+        public CreatureTypes Type;
+        public int Faction;
+        protected AIState AIState;
 
         public CreatureBase()
         {
-            World = (WorldMap)Utilities.InterStateResources.Instance.Resources["Game_WorldMap"];
+            Level = (Map)Utilities.InterStateResources.Instance.Resources["Game_CurrentLevel"];
+            AIState = AIState.Wandering;
             Log = (Utilities.MessageLog)Utilities.InterStateResources.Instance.Resources["Game_MessageLog"];
         }
 
+        #region Movement Methods
+        private void Move(int X, int Y)
+        {
+
+            System.Drawing.Point LocalPosToCheck = new System.Drawing.Point();
+
+            LocalPosToCheck.X = Position.X + X;
+            LocalPosToCheck.Y = Position.Y + Y;
+
+            if (Level.CheckWalkable(LocalPosToCheck))
+            {
+ 
+                Position.X = LocalPosToCheck.X;
+                Position.Y = LocalPosToCheck.Y;
+            }
+        }
+
+        public void MoveUpLeft()
+        {
+            Move(-1, -1);
+        }
         public void MoveUp()
         {
-            if (LocalPos.Y == 0)
-            {
-                if (GlobalPos.Y == 0)
-                {
-                    if (World.CheckWalkable(new System.Drawing.Point(GlobalPos.X, 29), new System.Drawing.Point(LocalPos.X, 29)))
-                    {
-                        World.MoveCreature(this, World.LocalMaps[GlobalPos.X, GlobalPos.Y], World.LocalMaps[GlobalPos.X, 29]);
-                        GlobalPos.Y = 29;
-                        LocalPos.Y = 29;
-                    }
-                }
-                else
-                {
-                    if (World.CheckWalkable(new System.Drawing.Point(GlobalPos.X, GlobalPos.Y - 1), new System.Drawing.Point(LocalPos.X, 29)))
-                    {
-                        World.MoveCreature(this, World.LocalMaps[GlobalPos.X, GlobalPos.Y], World.LocalMaps[GlobalPos.X, GlobalPos.Y - 1]);
-                        GlobalPos.Y--;
-                        LocalPos.Y = 29;
-                    }
-                }
-                Log.AddMsg("Moved Globally to: " + GlobalPos.ToString());
-            }
-            else
-            {
-                if (World.CheckWalkable(GlobalPos, new System.Drawing.Point(LocalPos.X, LocalPos.Y - 1)))
-                {
-                    LocalPos.Y--;
-                    Log.AddMsg("Moved Locally to: " + LocalPos.ToString());
-                }
-            }
+            Move(0, -1);
         }
-
-        public void MoveDown()
+        public void MoveUpRight()
         {
-            if (LocalPos.Y == 29)
-            {
-                if (GlobalPos.Y == 29)
-                {
-                    if (World.CheckWalkable(new System.Drawing.Point(GlobalPos.X, 0), new System.Drawing.Point(LocalPos.X, 0)))
-                    {
-                        World.MoveCreature(this, World.LocalMaps[GlobalPos.X, GlobalPos.Y], World.LocalMaps[GlobalPos.X, 0]);
-                        GlobalPos.Y = 0;
-                        LocalPos.Y = 0;
-                    }
-                }
-                else
-                {
-                    if (World.CheckWalkable(new System.Drawing.Point(GlobalPos.X, GlobalPos.Y + 1), new System.Drawing.Point(LocalPos.X, 0)))
-                    {
-                        World.MoveCreature(this, World.LocalMaps[GlobalPos.X, GlobalPos.Y], World.LocalMaps[GlobalPos.X, GlobalPos.Y + 1]);
-                        GlobalPos.Y++;
-                        LocalPos.Y = 0;
-                    }
-                }
-                Log.AddMsg("Moved Globally to: " + GlobalPos.ToString());
-            }
-            else
-            {
-                if (World.CheckWalkable(GlobalPos, new System.Drawing.Point(LocalPos.X, LocalPos.Y + 1)))
-                {
-                    LocalPos.Y++;
-                    Log.AddMsg("Moved Locally to: " + LocalPos.ToString());
-                }
-            }
+            Move(1, -1);
         }
-
-        public void MoveLeft()
-        {
-            if (LocalPos.X == 0)
-            {
-                if (GlobalPos.X == 0)
-                {
-                    if (World.CheckWalkable(new System.Drawing.Point(89, GlobalPos.Y), new System.Drawing.Point(89, LocalPos.Y)))
-                    {
-                        World.MoveCreature(this, World.LocalMaps[GlobalPos.X, GlobalPos.Y], World.LocalMaps[89, GlobalPos.Y]);
-                        GlobalPos.X = 89;
-                        LocalPos.X = 89;
-                        
-                    }
-                }
-                else
-                {
-                    if (World.CheckWalkable(new System.Drawing.Point(GlobalPos.X - 1, GlobalPos.Y), new System.Drawing.Point(89, LocalPos.Y)))
-                    {
-                        World.MoveCreature(this, World.LocalMaps[GlobalPos.X, GlobalPos.Y], World.LocalMaps[GlobalPos.X - 1, GlobalPos.Y]);
-                        GlobalPos.X--;
-                        LocalPos.X = 89;
-                    }
-                }
-                Log.AddMsg("Moved Globally to: " + GlobalPos.ToString());
-            }
-            else
-            {
-                if (World.CheckWalkable(GlobalPos, new System.Drawing.Point(LocalPos.X - 1, LocalPos.Y)))
-                {
-                    LocalPos.X--;
-                    Log.AddMsg("Moved Locally to: " + LocalPos.ToString());
-                }
-            }
-        }
-
         public void MoveRight()
         {
-            if (LocalPos.X == 89)
-            {
-                if (GlobalPos.X == 89)
-                {
-                    if (World.CheckWalkable(new System.Drawing.Point(0, GlobalPos.Y), new System.Drawing.Point(0, LocalPos.Y)))
-                    {
-                        World.MoveCreature(this, World.LocalMaps[GlobalPos.X, GlobalPos.Y], World.LocalMaps[0, GlobalPos.Y]);
-                        GlobalPos.X = 0;
-                        LocalPos.X = 0;
+            Move(1, 0);
+        }
+        public void MoveDownRight()
+        {
+            Move(1, 1);
+        }
+        public void MoveDown()
+        {
+            Move(0, 1);
+        }
+        public void MoveDownLeft()
+        {
+            Move(-1, 1);
+        }
+        public void MoveLeft()
+        {
+            Move(-1, 0);
+        }
+        #endregion
 
-                    }
-                }
-                else
+        public abstract void AI();
+
+        #region AI Helper Methods
+        public float PhysicalCondition
+        {
+            get
+            {
+                return (float)(HP / MaxHP);
+            }
+        }
+
+        public float PercievedStrength
+        {
+            get
+            {
+                return (float)(PhysicalCondition * BaseStrength);
+            }
+        }
+
+        public float PercievedDanger
+        {
+            get
+            {
+                return PercievedStrength;
+            }
+        }
+        #endregion
+
+        public bool CanSeeCell(System.Drawing.Point Coords)
+        {
+            //Is cell inside circleofsight?
+            if ((Math.Pow((double)(Coords.X - Position.X), (double)2) + Math.Pow((double)(Coords.Y - Position.Y), (double)2)) < (Math.Pow(Math.Round((double)(BaseAim / 2) + 1, 0), (double)2)))
+            {
+                foreach (System.Drawing.Point P in Utilities.GeneralMethods.CalcBresenhamLine(Position, Coords))
                 {
-                    if (World.CheckWalkable(new System.Drawing.Point(GlobalPos.X + 1, GlobalPos.Y), new System.Drawing.Point(0, LocalPos.Y)))
+                    if (!Level.CheckSeeThrough(P))
                     {
-                        World.MoveCreature(this, World.LocalMaps[GlobalPos.X, GlobalPos.Y], World.LocalMaps[GlobalPos.X + 1, GlobalPos.Y]);
-                        GlobalPos.X++;
-                        LocalPos.X = 0;
+                        return false;
                     }
                 }
-                Log.AddMsg("Moved Globally to: " + GlobalPos.ToString());
+
+                return true;
             }
             else
             {
-                if (World.CheckWalkable(GlobalPos, new System.Drawing.Point(LocalPos.X + 1, LocalPos.Y)))
-                {
-                    LocalPos.X++;
-                    Log.AddMsg("Moved Locally to: " + LocalPos.ToString());
-                }
+                return false;
             }
         }
+    }
+
+    public struct AILoveHateFearCreatureSet
+    {
+        public float Love_Fear;
+        public float Hate;
+        public CreatureBase SubjectCreature;
     }
 }
