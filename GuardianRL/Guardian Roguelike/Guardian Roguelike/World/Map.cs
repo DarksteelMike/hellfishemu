@@ -314,22 +314,25 @@ namespace Guardian_Roguelike.World
             sw.Close();
         }
 
-        public void DestroyTile(int x, int y)
+        public DestroyResults DestroyTile(int x, int y)
         {
+            if (DisplayData[x, y].Walkable)
+            {
+                return DestroyResults.AlreadyEmpty;
+            }
             if (DisplayData[x, y].Destructible)
             {
                 DisplayData[x, y] = TerrainTile.Create(TerrainTypes.EmptyFloor);
+                return DestroyResults.Success;
             }
             else
             {
-                Utilities.MessageLog ml = (Utilities.MessageLog)Utilities.InterStateResources.Instance.Resources["Game_MessageLog"];
-
-                ml.AddMsg("You swing with all your might, but the pick bounces off the wall without doing damage.");
-                //TODO: Do damage to the pick.
+                return DestroyResults.Indestructible;
             }
         }
     }
 
+    public enum DestroyResults { AlreadyEmpty, Indestructible, Cancelled, Success };
     public enum TerrainTypes {IndestructibleWall, DestructibleWall,ExitPortal,EmptyFloor,Water,Lava,Fog};
     public struct TerrainTile
     {

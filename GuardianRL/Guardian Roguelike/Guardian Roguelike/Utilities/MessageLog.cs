@@ -17,21 +17,7 @@ namespace Guardian_Roguelike.Utilities
 
         public void AddMsg(string Msg)
         {
-            if (Lines.Count == 0)
-            {
-                Lines.Add(Msg);
-            }
-            else
-            {
-                Lines[Lines.Count - 1] += Msg;
-            }
-            while (Lines[Lines.Count - 1].Length > 90)
-            {
-                string NewLine = Lines[Lines.Count - 1].Substring(89);
-                Lines[Lines.Count - 1] = Lines[Lines.Count - 1].Substring(0, 89);
-                Lines.Add(NewLine);
-
-            }
+            Lines.Add(Msg);
 
             while (Lines.Count > 90)
             {
@@ -44,7 +30,7 @@ namespace Guardian_Roguelike.Utilities
 
             for (int i = (Lines.Count - 4 > 0 ? Lines.Count-4 : 0),j=0; i < Lines.Count; i++,j++)
             {
-                Target.PrintLine(Lines[i], 0, j, libtcodWrapper.LineAlignment.Left);
+                Target.PrintLine(Lines[i] + "\n", 0, j, libtcodWrapper.LineAlignment.Left);
             }
         }
 

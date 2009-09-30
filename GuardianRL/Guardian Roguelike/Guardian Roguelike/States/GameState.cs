@@ -15,7 +15,13 @@ namespace Guardian_Roguelike.States
         private Utilities.MessageLog MsgLog;
         private libtcodWrapper.Console MsgCons;
 
+        private libtcodWrapper.Console StatusCons;
+
         private Modes CurMode;
+
+        private int SkipTurns;
+
+        private int TurnsPassed;
 
         public GameState() : base()
         {
@@ -31,12 +37,14 @@ namespace Guardian_Roguelike.States
             }
             World.Creatures.Dwarf tPlayer = new Guardian_Roguelike.World.Creatures.Dwarf();
             tPlayer.Position.X = tPlayer.Position.Y = 1;
-            tPlayer.Name = "Bellerofon";
+            tPlayer.Name = "Urist";
             tPlayer.DrawColor = libtcodWrapper.ColorPresets.ForestGreen;
             if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_PlayerCreature"))
             {
                 Utilities.InterStateResources.Instance.Resources.Add("Game_PlayerCreature", tPlayer);
             }
+
+            StatusCons = libtcodWrapper.RootConsole.GetNewConsole(90, 5);
 
             MapCons = libtcodWrapper.RootConsole.GetNewConsole(90, 30);
 
@@ -56,7 +64,9 @@ namespace Guardian_Roguelike.States
             */
             Player.Position = CurrentLevel.GetFirstWalkable();
 
-            MsgLog.AddMsg("Welcome to Guardian, " + Player.Name + "!");
+            MsgLog.AddMsg("Get running, " + Player.Name + "!");
+
+            TurnsPassed = SkipTurns = 0;
         }
 
         public override void EnterState()
@@ -67,17 +77,22 @@ namespace Guardian_Roguelike.States
         public override void MainLoop()
         {            
             libtcodWrapper.KeyPress key;
+            Render();
             while (true)
-            {
-                AI();
-                Render();
-                
+            {                
                 key = libtcodWrapper.Keyboard.WaitForKeyPress(true);
 
                 if (ProcessInput(key))
                 {
                     break;
                 }
+
+                do
+                {
+                    AI();
+                    Render();
+                    TurnsPassed++;
+                } while (SkipTurns-- > 0);
             }
         }
 
@@ -90,6 +105,9 @@ namespace Guardian_Roguelike.States
             CurrentLevel.RenderToConsole(MapCons);
 
             MapCons.Blit(0, 0, 90, 30, Root, 1, 5);
+
+            StatusCons.PrintLine("HP: " + Player.HP.ToString() + "/" + Player.MaxHP.ToString() + "  Turn: " + TurnsPassed.ToString(),0,0,libtcodWrapper.LineAlignment.Left);
+            StatusCons.Blit(0, 0, 90, 5, Root, 0, 35);
 
             Root.Flush();
         }
@@ -109,51 +127,80 @@ namespace Guardian_Roguelike.States
         {
             if (CurMode == Modes.Digging)
             {
+                World.DestroyResults DR = Guardian_Roguelike.World.DestroyResults.Cancelled;
                 switch (KP.KeyCode)
                 {
                     case (libtcodWrapper.KeyCode.TCODK_HOME):
-                        CurrentLevel.DestroyTile(Player.Position.X - 1, Player.Position.Y - 1);
+                        DR = CurrentLevel.DestroyTile(Player.Position.X - 1, Player.Position.Y - 1);
                         Player.MoveUpLeft();
                         CurMode = Modes.Normal;
+                        SkipTurns = 2;
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_UP):
-                        CurrentLevel.DestroyTile(Player.Position.X, Player.Position.Y - 1);
+                        DR = CurrentLevel.DestroyTile(Player.Position.X, Player.Position.Y - 1);
                         Player.MoveUp();
                         CurMode = Modes.Normal;
+                        SkipTurns = 2;
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_PAGEUP):
-                        CurrentLevel.DestroyTile(Player.Position.X + 1, Player.Position.Y - 1);
+                        DR = CurrentLevel.DestroyTile(Player.Position.X + 1, Player.Position.Y - 1);
                         Player.MoveUpRight();
                         CurMode = Modes.Normal;
+                        SkipTurns = 2;
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_RIGHT):
-                        CurrentLevel.DestroyTile(Player.Position.X + 1, Player.Position.Y);
+                        DR = CurrentLevel.DestroyTile(Player.Position.X + 1, Player.Position.Y);
                         Player.MoveRight();
                         CurMode = Modes.Normal;
+                        SkipTurns = 2;
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_PAGEDOWN):
-                        CurrentLevel.DestroyTile(Player.Position.X + 1, Player.Position.Y + 1);
+                        DR = CurrentLevel.DestroyTile(Player.Position.X + 1, Player.Position.Y + 1);
                         Player.MoveDownRight();
                         CurMode = Modes.Normal;
+                        SkipTurns = 2;
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_DOWN):
-                        CurrentLevel.DestroyTile(Player.Position.X, Player.Position.Y + 1);
+                        DR = CurrentLevel.DestroyTile(Player.Position.X, Player.Position.Y + 1);
                         Player.MoveDown();
                         CurMode = Modes.Normal;
+                        SkipTurns = 2;
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_END):
-                        CurrentLevel.DestroyTile(Player.Position.X - 1, Player.Position.Y + 1);
+                        DR = CurrentLevel.DestroyTile(Player.Position.X - 1, Player.Position.Y + 1);
                         Player.MoveDownLeft();
                         CurMode = Modes.Normal;
+                        SkipTurns = 2;
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_LEFT):
-                        CurrentLevel.DestroyTile(Player.Position.X - 1, Player.Position.Y);
+                        DR = CurrentLevel.DestroyTile(Player.Position.X - 1, Player.Position.Y);
                         Player.MoveLeft();
                         CurMode = Modes.Normal;
+                        SkipTurns = 2;
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_ESCAPE):
                         CurMode = Modes.Normal;
                         break;
+                }
+
+                //Diggin *was* attempted, add appropriate message to log
+                if (CurMode == Modes.Normal)
+                {
+                    switch (DR)
+                    {
+                        case(World.DestroyResults.AlreadyEmpty):
+                            MsgLog.AddMsg("You swing at the air,predictably hitting nothing, and stumble forward.");
+                            break;
+                        case(World.DestroyResults.Cancelled):
+                            MsgLog.AddMsg("You lower your pick again.");
+                            break;
+                        case(World.DestroyResults.Indestructible):
+                            MsgLog.AddMsg("You swing with all your strength, but the pick bounces off the wall without doing damage.");
+                            break;
+                        case(World.DestroyResults.Success):
+                            MsgLog.AddMsg("The rock crumbles under the might of your pick.");
+                            break;
+                    }
                 }
                 return false;
             }

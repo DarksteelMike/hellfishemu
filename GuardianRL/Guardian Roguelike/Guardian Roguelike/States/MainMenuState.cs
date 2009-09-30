@@ -76,11 +76,11 @@ namespace Guardian_Roguelike.States
                     switch (SelectedMenuItem)
                     {
                         case(0): //New Game
-                            StateManager.QueueState(new GameState());
+                            StateManager.QueueState(States.StateManager.PersistentStates["GameState"]);
                             return true;
                             break;
                         case(1): //Quit
-                            StateManager.QueueState(new QuitState());
+                            StateManager.QueueState(States.StateManager.PersistentStates["QuitState"]);
                             return true;
                             break;
                     }
