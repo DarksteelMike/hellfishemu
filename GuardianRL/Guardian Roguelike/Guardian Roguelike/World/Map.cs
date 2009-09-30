@@ -9,10 +9,9 @@ namespace Guardian_Roguelike.World
         private static Random RandGen;
         public const int WIDTH = 90;
         public const int HEIGHT = 30;
-        public char[,] DisplayData;
-        public TerrainTile[,] NewDisplayData;
-        private bool[,] WalkabilityData;
-        private bool[,] SeeThroughData;
+        public TerrainTile[,] DisplayData;
+        //private bool[,] WalkabilityData;
+        //private bool[,] SeeThroughData;
 
         public List<Creatures.CreatureBase> Creatures;
 
@@ -23,45 +22,29 @@ namespace Guardian_Roguelike.World
             {
                 RandGen = new Random(System.DateTime.Now.Millisecond);
             }
-            DisplayData = new char[WIDTH, HEIGHT];
-            NewDisplayData = new TerrainTile[WIDTH, HEIGHT];
-            WalkabilityData = new bool[WIDTH, HEIGHT];
-            SeeThroughData = new bool[WIDTH, HEIGHT];
-            for (int x = 0; x < WIDTH; x++)
-            {
-                for (int y = 0; y < HEIGHT; y++)
-                {
-                    DisplayData[x, y] = '.';
-                    WalkabilityData[x, y] = true;
-                    SeeThroughData[x, y] = true;
-                    if (RandGen.Next(0, 100) > 50)
-                    {
-                        DisplayData[x, y] = '=';
-                        WalkabilityData[x, y] = false;
-                        SeeThroughData[x, y] = false;
-                    }
-                }
-            }
+            DisplayData = new TerrainTile[WIDTH, HEIGHT];
+            //WalkabilityData = new bool[WIDTH, HEIGHT];
+            //SeeThroughData = new bool[WIDTH, HEIGHT];            
 
-            for (int x = 0; x < WIDTH; x++)
-            {
-                for (int y = 0; y < HEIGHT; y++)
-                {
-                    NewDisplayData[x, y] = TerrainTile.Create(TerrainTypes.EmptyFloor);
-                    if (RandGen.Next(0, 100) > 50)
-                    {
-                        NewDisplayData[x, y] = TerrainTile.Create(TerrainTypes.DestructibleWall);
-                    }
-                }
-            }
-
-            Generate(5);
+            Generate();
 
         }
 
-        private void Generate(int iters)
+        private void Generate()
         {
-            for (int i = 0; i < iters; i++)
+            for (int x = 0; x < WIDTH; x++)
+            {
+                for (int y = 0; y < HEIGHT; y++)
+                {
+                    DisplayData[x, y] = TerrainTile.Create(TerrainTypes.EmptyFloor);
+                    if (RandGen.Next(0, 100) > 51)
+                    {
+                        DisplayData[x, y] = TerrainTile.Create(TerrainTypes.DestructibleWall);
+                    }
+                }
+            }
+
+            for (int i = 0; i < 5; i++)
             {
                 char[,] DisplayDataRet = new char[WIDTH, HEIGHT];
                 TerrainTile[,] NewDisplayDataRet = new TerrainTile[WIDTH, HEIGHT];
@@ -70,9 +53,9 @@ namespace Guardian_Roguelike.World
                 {
                     for (int y = 0; y < HEIGHT; y++)
                     {
-                        if (NewDisplayData[x,y].Type == TerrainTypes.DestructibleWall)
+                        if (DisplayData[x,y].Type == TerrainTypes.DestructibleWall)
                         {
-                            if (CountNeighbouringWalls(NewDisplayData, x, y) >= 4)
+                            if (CountNeighbouringWalls(DisplayData, x, y) >= 4)
                             {
                                 NewDisplayDataRet[x, y] = TerrainTile.Create(TerrainTypes.DestructibleWall);
                             }
@@ -83,7 +66,7 @@ namespace Guardian_Roguelike.World
                         }
                         else
                         {
-                            if (CountNeighbouringWalls(NewDisplayData, x, y) >= 5)
+                            if (CountNeighbouringWalls(DisplayData, x, y) >= 5)
                             {
                                 NewDisplayDataRet[x, y] = TerrainTile.Create(TerrainTypes.DestructibleWall);
                             }
@@ -95,7 +78,7 @@ namespace Guardian_Roguelike.World
                     }
                 }
 
-                Utilities.GeneralMethods.Copy2DArray<TerrainTile>(NewDisplayDataRet, ref NewDisplayData, WIDTH, HEIGHT);
+                Utilities.GeneralMethods.Copy2DArray<TerrainTile>(NewDisplayDataRet, ref DisplayData, WIDTH, HEIGHT);
             }
 
             //Close off boundaries
@@ -105,10 +88,18 @@ namespace Guardian_Roguelike.World
                 {
                     if (x == 0 || y == 0 || x == (WIDTH-1) || y == (HEIGHT-1))
                     {
-                        NewDisplayData[x, y] = TerrainTile.Create(TerrainTypes.IndestructibleWall);
+                        DisplayData[x, y] = TerrainTile.Create(TerrainTypes.IndestructibleWall);
                     }
                 }
             }
+
+            //Place the stairs to the next level
+            int ExitX, ExitY;
+
+            ExitX = RandGen.Next(1, WIDTH-1);
+            ExitY = RandGen.Next(1, HEIGHT-1);
+
+            DisplayData[ExitX, ExitY] = TerrainTile.Create(TerrainTypes.ExitPortal);
         }
 
         public System.Drawing.Point GetFirstWalkable()
@@ -119,6 +110,19 @@ namespace Guardian_Roguelike.World
                 {
                     if (CheckWalkable(x, y))
                     {
+                        bool occupied = false;
+                        foreach (World.Creatures.CreatureBase C in Creatures)
+                        {
+                            if (C.Position.X == x && C.Position.Y == y)
+                            {
+                                occupied = true;
+                                break;
+                            }
+                        }
+                        if (occupied)
+                        {
+                            continue;
+                        }
                         return new System.Drawing.Point(x, y);
                     }
                 }
@@ -253,8 +257,8 @@ namespace Guardian_Roguelike.World
             {
                 for (int y = 0; y < HEIGHT; y++)
                 {
-                    Target.ForegroundColor = NewDisplayData[x, y].DrawColor;
-                    Target.PutChar(x, y, NewDisplayData[x, y].CharRepresentation);
+                    Target.ForegroundColor = DisplayData[x, y].DrawColor;
+                    Target.PutChar(x, y, DisplayData[x, y].CharRepresentation);
                 }
             }
 
@@ -273,7 +277,7 @@ namespace Guardian_Roguelike.World
         /// <returns>True if walkable.</returns>
         public bool CheckWalkable(int x, int y)
         {
-            return NewDisplayData[x,y].Walkable;
+            return DisplayData[x,y].Walkable;
         }
 
         /// <summary>
@@ -288,46 +292,12 @@ namespace Guardian_Roguelike.World
 
         public bool CheckSeeThrough(int x, int y)
         {
-            return NewDisplayData[x,y].Seethrough;
+            return DisplayData[x,y].Seethrough;
         }
 
         public bool CheckSeeThrough(System.Drawing.Point p)
         {
             return CheckSeeThrough(p.X, p.Y);
-        }
-
-        /// <summary>
-        /// Returns the most common tile on the map, for use in the world map.
-        /// </summary>
-        /// <returns>A char, the most common tile.</returns>
-        public char GetWorldMapRepresentation()
-        {
-            Dictionary<char, int> Fields = new Dictionary<char,int>();
-            foreach (char c in DisplayData)
-            {
-                if (Fields.ContainsKey(c))
-                {
-                    Fields[c]++;
-                }
-                else
-                {
-                    Fields[c] = 1;
-                }
-            }
-            
-            int imax;
-            char cmax;
-            imax = 0; cmax = ' ';
-            foreach (char c in Fields.Keys)
-            {
-                if (Fields[c] > imax)
-                {
-                    imax = Fields[c];
-                    cmax = c;
-                }
-            }
-
-            return cmax;
         }
 
         public void DEBUG_Savemap(string Filename)
@@ -337,15 +307,30 @@ namespace Guardian_Roguelike.World
             {
                 for (int x = 0; x < 90; x++)
                 {
-                    sw.Write(DisplayData[x, y]);
+                    sw.Write(DisplayData[x, y].CharRepresentation);
                 }
                 sw.Write('\n');
             }
             sw.Close();
         }
+
+        public void DestroyTile(int x, int y)
+        {
+            if (DisplayData[x, y].Destructible)
+            {
+                DisplayData[x, y] = TerrainTile.Create(TerrainTypes.EmptyFloor);
+            }
+            else
+            {
+                Utilities.MessageLog ml = (Utilities.MessageLog)Utilities.InterStateResources.Instance.Resources["Game_MessageLog"];
+
+                ml.AddMsg("You swing with all your might, but the pick bounces off the wall without doing damage.");
+                //TODO: Do damage to the pick.
+            }
+        }
     }
 
-    public enum TerrainTypes {IndestructibleWall, DestructibleWall,EmptyFloor,Water,Lava};
+    public enum TerrainTypes {IndestructibleWall, DestructibleWall,ExitPortal,EmptyFloor,Water,Lava,Fog};
     public struct TerrainTile
     {
         public TerrainTypes Type;
@@ -370,19 +355,25 @@ namespace Guardian_Roguelike.World
             switch (Type)
             {
                 case(TerrainTypes.IndestructibleWall):
-                    return new TerrainTile('=', libtcodWrapper.ColorPresets.Gray, false,false,false,Type);
+                    return new TerrainTile('#', libtcodWrapper.ColorPresets.Gray, false, false, false,Type);
                     break;
                 case(TerrainTypes.DestructibleWall):
-                    return new TerrainTile('=', libtcodWrapper.ColorPresets.GhostWhite, true, false, false, Type);
+                    return new TerrainTile('#', libtcodWrapper.ColorPresets.GhostWhite, true, false, false, Type);
+                    break;
+                case(TerrainTypes.ExitPortal):
+                    return new TerrainTile('>', libtcodWrapper.ColorPresets.GhostWhite, false, true, true, Type);
                     break;
                 case(TerrainTypes.EmptyFloor):
                     return new TerrainTile('.', libtcodWrapper.ColorPresets.GhostWhite, false, true, true, Type);
                     break;
                 case(TerrainTypes.Water):
-                    return new TerrainTile('#', libtcodWrapper.ColorPresets.Blue, false, true, true, Type);
+                    return new TerrainTile('=', libtcodWrapper.ColorPresets.Blue, false, true, true, Type);
                     break;
                 case(TerrainTypes.Lava):
-                    return new TerrainTile('#', libtcodWrapper.ColorPresets.Red, false, true, true, Type);
+                    return new TerrainTile('=', libtcodWrapper.ColorPresets.Red, false, true, true, Type);
+                    break;
+                case(TerrainTypes.Fog):
+                    return new TerrainTile('~', libtcodWrapper.ColorPresets.Gray, false, true, false, Type);
                     break;
                 default:
                     return new TerrainTile('?', libtcodWrapper.ColorPresets.Pink, false, true, true, Type);

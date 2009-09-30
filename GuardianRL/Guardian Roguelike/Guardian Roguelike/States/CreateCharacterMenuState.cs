@@ -6,27 +6,29 @@ namespace Guardian_Roguelike.States
 {
     class CreateCharacterMenuState : StateBase
     {
-        private World.Creatures.Guardian Player;
+        private World.Creatures.Dwarf Player;
         private string Name;
-        private World.Creatures.Deity AttachedDeity;
-
         private libtcodWrapper.Console DispCons;
+        private int CreationStep;
        
         public override void EnterState()
         {
-            Player = new Guardian_Roguelike.World.Creatures.Guardian();
+            Player = new Guardian_Roguelike.World.Creatures.Dwarf();
             DispCons = libtcodWrapper.RootConsole.GetNewConsole(90, 30);
+            CreationStep = 0;
         }
 
         public override void MainLoop()
         {
-            throw new Exception("The method or operation is not implemented.");
+            while (true)
+            {
+
+            }
         }
 
         public override void ExitState()
         {
             Player.Name = Name;
-            Player.AttachedDeity = AttachedDeity;
         }
     }
 }

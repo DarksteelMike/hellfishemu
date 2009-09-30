@@ -1,0 +1,12 @@
+First of all, disregard the "Guardian Roguelike" solution name. It was chosen with grander and more 
+foolhardy plans in mind.
+
+The name is "Run, Urist, Run!" and follows Urist McDwarf, a new immigrant to a fortress somewhere in the 
+world. His luck is very short-lived though, as he arrives just before a megabeast attack! Now the fortress
+is in shambles and Urist is pursued by some quick beast into the fortress' megaproject, an obsidian silo,
+wielding only his trusted copper pick(Which can't scratch the obsidian borders) and the wings his fear gives
+him. The player now takes control of Urist with certain death from the chasing megabeast above and probable
+death from the dark forces below, who're taking the chance to invade the once rich fortress. Urist must 
+descend the megaproject, stealing equipment from the dark forces or finding dwarven same and growing more 
+skilled in the dealing of death until he either is strong enough to slay the chasing beast or find the 
+rumored escape tunnel leading to the other side of the mountain.

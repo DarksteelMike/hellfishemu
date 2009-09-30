@@ -7,10 +7,11 @@ namespace Guardian_Roguelike.World.Creatures
     public enum CreatureTypes { Guardian, Human, Sheep };
     public enum Deity { Earth, Wind, Fire, Water, Pagan };
     public enum AIState { Wandering, Tracking, Attacking, Fleeing };
-
+    
     public abstract class CreatureBase
     {
         //Stats
+        public string Name;
         public int HP;
         public int MaxHP;
         public int BaseVigor;
@@ -26,20 +27,24 @@ namespace Guardian_Roguelike.World.Creatures
 
         //Internal Stuffis
         protected Map Level;
-        protected Utilities.MessageLog Log;
+        public Utilities.MessageLog Log;
         public CreatureTypes Type;
         public int Faction;
-        protected AIState AIState;
+
+        //AI Stuff
+        //public
 
         public CreatureBase()
         {
+            HP = MaxHP = 100;
+            BaseVigor = BaseEnergy = BaseSpeed = BaseAim = BaseStrength = 7;
+
             Level = (Map)Utilities.InterStateResources.Instance.Resources["Game_CurrentLevel"];
-            AIState = AIState.Wandering;
             Log = (Utilities.MessageLog)Utilities.InterStateResources.Instance.Resources["Game_MessageLog"];
         }
 
         #region Movement Methods
-        private void Move(int X, int Y)
+        public void Move(int X, int Y)
         {
 
             System.Drawing.Point LocalPosToCheck = new System.Drawing.Point();
@@ -89,8 +94,6 @@ namespace Guardian_Roguelike.World.Creatures
         }
         #endregion
 
-        public abstract void AI();
-
         #region AI Helper Methods
         public float PhysicalCondition
         {
@@ -120,7 +123,7 @@ namespace Guardian_Roguelike.World.Creatures
         public bool CanSeeCell(System.Drawing.Point Coords)
         {
             //Is cell inside circleofsight?
-            if ((Math.Pow((double)(Coords.X - Position.X), (double)2) + Math.Pow((double)(Coords.Y - Position.Y), (double)2)) < (Math.Pow(Math.Round((double)(BaseAim / 2) + 1, 0), (double)2)))
+            if ((Math.Pow((double)(Coords.X - Position.X), (double)2) + Math.Pow((double)(Coords.Y - Position.Y), (double)2)) < (Math.Pow(Math.Round((double)BaseAim + 1, 0), (double)2)))
             {
                 foreach (System.Drawing.Point P in Utilities.GeneralMethods.CalcBresenhamLine(Position, Coords))
                 {
@@ -137,6 +140,12 @@ namespace Guardian_Roguelike.World.Creatures
                 return false;
             }
         }
+
+        public void AI()
+        {
+            return;
+        }
+
     }
 
     public struct AILoveHateFearCreatureSet

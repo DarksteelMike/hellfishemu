@@ -64,14 +64,21 @@
     <Compile Include="States\QuitState.cs" />
     <Compile Include="States\StateBase.cs" />
     <Compile Include="States\StateManager.cs" />
-    <Compile Include="States\WorldMapMenuState.cs" />
     <Compile Include="Utilities\GeneralMethods.cs" />
     <Compile Include="Utilities\InterStateResources.cs" />
     <Compile Include="Utilities\MessageLog.cs" />
     <Compile Include="World\Creatures\CreatureBase.cs" />
     <Compile Include="World\Creatures\Guardian.cs" />
+    <Compile Include="World\Items\HeadwearBase.cs" />
+    <Compile Include="World\Items\Inventory.cs" />
+    <Compile Include="World\Items\ItemBase.cs" />
     <Compile Include="World\Map.cs" />
-    <Compile Include="World\WorldMap.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Premise.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AI\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
