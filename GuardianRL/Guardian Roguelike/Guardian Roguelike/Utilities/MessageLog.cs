@@ -6,18 +6,35 @@ namespace Guardian_Roguelike.Utilities
 {
     public enum MessageLogScrollPossibilities{ None,Up,Down,Both };
 
+    public struct Message
+    {
+        public string Text;
+        public libtcodWrapper.Color TextColor;
+
+        public Message(string t, libtcodWrapper.Color c)
+        {
+            Text = t;
+            TextColor = c;
+        }
+    }
+
     public class MessageLog
     {
-        private List<string> Lines;
+        private List<Message> Lines;
 
         public MessageLog()
         {
-            Lines = new List<string>();
+            Lines = new List<Message>();
         }
 
         public void AddMsg(string Msg)
         {
-            Lines.Add(Msg);
+            AddMsg(Msg, libtcodWrapper.Color.FromRGB(255, 255, 255));
+        }
+
+        public void AddMsg(string Msg, libtcodWrapper.Color Col)
+        {
+            Lines.Add(new Message(Msg,Col));
 
             while (Lines.Count > 90)
             {
@@ -30,7 +47,8 @@ namespace Guardian_Roguelike.Utilities
 
             for (int i = (Lines.Count - 4 > 0 ? Lines.Count-4 : 0),j=0; i < Lines.Count; i++,j++)
             {
-                Target.PrintLine(Lines[i] + "\n", 0, j, libtcodWrapper.LineAlignment.Left);
+                Target.ForegroundColor = Lines[i].TextColor;
+                Target.PrintLine(Lines[i].Text + "\n", 0, j, libtcodWrapper.LineAlignment.Left);
             }
         }
 
@@ -52,7 +70,8 @@ namespace Guardian_Roguelike.Utilities
             }
             for (int i = Scroll,j=0; i < Lines.Count; i++,j++)
             {
-                Target.PrintLine(Lines[i], 0, j, libtcodWrapper.LineAlignment.Left);
+                Target.ForegroundColor = Lines[i].TextColor;
+                Target.PrintLine(Lines[i].Text, 0, j, libtcodWrapper.LineAlignment.Left);
                 if (j > 30)
                 {
                     canscrolldown = true;

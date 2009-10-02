@@ -12,6 +12,7 @@ namespace Guardian_Roguelike
         [STAThread]
         static void Main()
         {
+
             libtcodWrapper.RootConsole.Fullscreen = false;
             libtcodWrapper.RootConsole.Width = 92;
             libtcodWrapper.RootConsole.Height = 40;

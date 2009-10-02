@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Guardian_Roguelike.World.Creatures
 {
-    public enum CreatureTypes { Guardian, Human, Sheep };
+    public enum CreatureTypes { Dwarf, Human, Sheep, Goblin, Elf };
     public enum Deity { Earth, Wind, Fire, Water, Pagan };
     public enum AIState { Wandering, Tracking, Attacking, Fleeing };
     
@@ -26,7 +26,7 @@ namespace Guardian_Roguelike.World.Creatures
         public char CharRepresentation;
 
         //Internal Stuffis
-        protected Map Level;
+        public Map Level;
         public Utilities.MessageLog Log;
         public CreatureTypes Type;
         public int Faction;

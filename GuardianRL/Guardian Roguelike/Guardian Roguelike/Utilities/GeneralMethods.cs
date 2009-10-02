@@ -26,6 +26,50 @@ namespace Guardian_Roguelike.Utilities
             System.Drawing.Point WStart, WEnd;
             bool Steep;
 
+            //Specialcase vertical and horizontal, the real algorithm should handle this. Dunno why this implementation doesn't.
+            if (Start.X == End.X) //Vertical
+            {
+                if (Start.Y > End.Y) //Up
+                {
+                    for (int y1 = Start.Y; y1 >= End.Y; y1--)
+                    {
+                        LinePoints.Add(new System.Drawing.Point(Start.X, y1));
+                    }
+                }
+                else if (Start.Y < End.Y) //Down
+                {
+                    for (int y1 = Start.Y; y1 <= End.Y; y1++)
+                    {
+                        LinePoints.Add(new System.Drawing.Point(Start.X, y1));
+                    }
+                }
+                else //Start == End!
+                {
+                    LinePoints.Add(Start);
+                }
+
+                return LinePoints;
+            }
+            if (Start.Y == End.Y) //Horizontal
+            {
+                if (Start.X > End.X) //Left
+                {
+                    for (int x1 = Start.X; x1 >= End.X; x1--)
+                    {
+                        LinePoints.Add(new System.Drawing.Point(x1, Start.Y));
+                    }
+                }
+                else //Right
+                {
+                    for (int x1 = Start.X; x1 <= End.X; x1++)
+                    {
+                        LinePoints.Add(new System.Drawing.Point(x1, Start.Y));
+                    }
+                }
+
+                return LinePoints;
+            }
+
             if (Math.Abs(End.Y - Start.Y) > Math.Abs(End.X - Start.X))
             {
                 WStart = End;

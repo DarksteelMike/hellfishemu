@@ -15,16 +15,17 @@ namespace Guardian_Roguelike.World
 
         public List<Creatures.CreatureBase> Creatures;
 
+        private libtcodWrapper.TCODFov FOVHandler;
+
         public Map()
-        {            
+        {
+            FOVHandler = new libtcodWrapper.TCODFov(WIDTH,HEIGHT);
             Creatures = new List<Guardian_Roguelike.World.Creatures.CreatureBase>();
             if (RandGen == null)
             {
                 RandGen = new Random(System.DateTime.Now.Millisecond);
             }
-            DisplayData = new TerrainTile[WIDTH, HEIGHT];
-            //WalkabilityData = new bool[WIDTH, HEIGHT];
-            //SeeThroughData = new bool[WIDTH, HEIGHT];            
+            DisplayData = new TerrainTile[WIDTH, HEIGHT];           
 
             Generate();
 
@@ -100,6 +101,8 @@ namespace Guardian_Roguelike.World
             ExitY = RandGen.Next(1, HEIGHT-1);
 
             DisplayData[ExitX, ExitY] = TerrainTile.Create(TerrainTypes.ExitPortal);
+
+            UpdateTCODMap();
         }
 
         public System.Drawing.Point GetFirstWalkable()
@@ -253,51 +256,61 @@ namespace Guardian_Roguelike.World
 
         public void RenderToConsole(libtcodWrapper.Console Target)
         {
+            Target.Clear();
             for (int x = 0; x < WIDTH; x++)
             {
                 for (int y = 0; y < HEIGHT; y++)
                 {
-                    Target.ForegroundColor = DisplayData[x, y].DrawColor;
-                    Target.PutChar(x, y, DisplayData[x, y].CharRepresentation);
+                    if (DisplayData[x, y].HasBeenSeen || DisplayData[x,y].Type == TerrainTypes.ExitPortal) //Last condition for debug only
+                    {
+                        if (DisplayData[x, y].IsVisible)
+                        {
+                            Target.ForegroundColor = DisplayData[x, y].DrawColor;
+                        }
+                        else
+                        {
+                            Target.ForegroundColor = libtcodWrapper.ColorPresets.Gray;
+                        }
+                        Target.PutChar(x, y, DisplayData[x, y].CharRepresentation);
+                    }
                 }
             }
 
             foreach (World.Creatures.CreatureBase C in Creatures)
             {
-                Target.ForegroundColor = C.DrawColor;
-                Target.PutChar(C.Position.X, C.Position.Y, C.CharRepresentation);
+                if (DisplayData[C.Position.X, C.Position.Y].IsVisible)
+                {
+                    Target.ForegroundColor = C.DrawColor;
+                    Target.PutChar(C.Position.X, C.Position.Y, C.CharRepresentation);
+                }
             }
         }
 
-        /// <summary>
-        /// Returns wether the square is walkable or not.
-        /// </summary>
-        /// <param name="x">X part of the LocalPosition</param>
-        /// <param name="y">Y part of the LocalPosition</param>
-        /// <returns>True if walkable.</returns>
+        public bool CheckWalkable(System.Drawing.Point p)
+        {
+            return CheckWalkable(p.X, p.Y);
+        }
         public bool CheckWalkable(int x, int y)
         {
             return DisplayData[x,y].Walkable;
         }
 
-        /// <summary>
-        /// Returns wether the square is walkable or not.
-        /// </summary>
-        /// <param name="p">The LocalPosition</param>
-        /// <returns>True if walkable.</returns>
-        public bool CheckWalkable(System.Drawing.Point p)
+        public bool CheckSeeThrough(System.Drawing.Point p)
         {
-            return CheckWalkable(p.X, p.Y);
+            return CheckSeeThrough(p.X, p.Y);
         }
-
         public bool CheckSeeThrough(int x, int y)
         {
             return DisplayData[x,y].Seethrough;
         }
-
-        public bool CheckSeeThrough(System.Drawing.Point p)
+        
+        public TerrainTypes CheckType(System.Drawing.Point p)
         {
-            return CheckSeeThrough(p.X, p.Y);
+            return CheckType(p.X, p.Y);
+        }
+        public TerrainTypes CheckType(int x, int y)
+        {
+            return DisplayData[x, y].Type;
         }
 
         public void DEBUG_Savemap(string Filename)
@@ -314,6 +327,10 @@ namespace Guardian_Roguelike.World
             sw.Close();
         }
 
+        public DestroyResults DestroyTile(System.Drawing.Point p)
+        {
+            return DestroyTile(p.X, p.Y);
+        }
         public DestroyResults DestroyTile(int x, int y)
         {
             if (DisplayData[x, y].Walkable)
@@ -323,11 +340,47 @@ namespace Guardian_Roguelike.World
             if (DisplayData[x, y].Destructible)
             {
                 DisplayData[x, y] = TerrainTile.Create(TerrainTypes.EmptyFloor);
+                FOVHandler.SetCell(x, y, true, true);
                 return DestroyResults.Success;
             }
             else
             {
                 return DestroyResults.Indestructible;
+            }
+        }
+
+        public void CalculateVisible(System.Drawing.Point From)
+        {
+            CalculateVisible(From.X, From.Y);
+        }
+        public void CalculateVisible(int FromX, int FromY)
+        {
+            FOVHandler.CalculateFOV(FromX, FromY, 0, true, libtcodWrapper.FovAlgorithm.Basic);
+            for (int x = 0; x < 90; x++)
+            {
+                for (int y = 0; y < 30; y++)
+                {
+                    if (FOVHandler.CheckTileFOV(x, y))
+                    {
+                        DisplayData[x, y].IsVisible = DisplayData[x, y].HasBeenSeen = true;
+                    }
+                    else
+                    {
+                        DisplayData[x, y].IsVisible = false;
+                    }
+                }
+            }
+        }
+
+        private void UpdateTCODMap()
+        {
+            FOVHandler.ClearMap();
+            for (int x = 0; x < WIDTH; x++)
+            {
+                for (int y = 0; y < HEIGHT; y++)
+                {
+                    FOVHandler.SetCell(x, y, DisplayData[x, y].Seethrough, DisplayData[x, y].Walkable);
+                }
             }
         }
     }
@@ -342,6 +395,8 @@ namespace Guardian_Roguelike.World
         public bool Destructible;
         public bool Walkable;
         public bool Seethrough;
+        public bool HasBeenSeen;
+        public bool IsVisible;
 
         public TerrainTile(char c, libtcodWrapper.Color col, bool d,bool w,bool s,TerrainTypes t)
         {
@@ -351,6 +406,7 @@ namespace Guardian_Roguelike.World
             Walkable = w;
             Seethrough = s;
             Type = t;
+            HasBeenSeen = IsVisible = false;
         }
 
         public static TerrainTile Create(TerrainTypes Type)
@@ -358,10 +414,10 @@ namespace Guardian_Roguelike.World
             switch (Type)
             {
                 case(TerrainTypes.IndestructibleWall):
-                    return new TerrainTile('#', libtcodWrapper.ColorPresets.Gray, false, false, false,Type);
+                    return new TerrainTile('#', libtcodWrapper.ColorPresets.GhostWhite, false, false, false,Type);
                     break;
                 case(TerrainTypes.DestructibleWall):
-                    return new TerrainTile('#', libtcodWrapper.ColorPresets.GhostWhite, true, false, false, Type);
+                    return new TerrainTile('=', libtcodWrapper.ColorPresets.GhostWhite, true, false, false, Type);
                     break;
                 case(TerrainTypes.ExitPortal):
                     return new TerrainTile('>', libtcodWrapper.ColorPresets.GhostWhite, false, true, true, Type);
@@ -370,13 +426,13 @@ namespace Guardian_Roguelike.World
                     return new TerrainTile('.', libtcodWrapper.ColorPresets.GhostWhite, false, true, true, Type);
                     break;
                 case(TerrainTypes.Water):
-                    return new TerrainTile('=', libtcodWrapper.ColorPresets.Blue, false, true, true, Type);
+                    return new TerrainTile('~', libtcodWrapper.ColorPresets.Blue, false, true, true, Type);
                     break;
                 case(TerrainTypes.Lava):
-                    return new TerrainTile('=', libtcodWrapper.ColorPresets.Red, false, true, true, Type);
+                    return new TerrainTile('~', libtcodWrapper.ColorPresets.Red, false, true, true, Type);
                     break;
                 case(TerrainTypes.Fog):
-                    return new TerrainTile('~', libtcodWrapper.ColorPresets.Gray, false, true, false, Type);
+                    return new TerrainTile('\'', libtcodWrapper.ColorPresets.Gray, false, true, false, Type);
                     break;
                 default:
                     return new TerrainTile('?', libtcodWrapper.ColorPresets.Pink, false, true, true, Type);

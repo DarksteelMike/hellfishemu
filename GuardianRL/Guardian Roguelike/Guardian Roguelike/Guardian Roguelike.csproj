@@ -68,7 +68,7 @@
     <Compile Include="Utilities\InterStateResources.cs" />
     <Compile Include="Utilities\MessageLog.cs" />
     <Compile Include="World\Creatures\CreatureBase.cs" />
-    <Compile Include="World\Creatures\Guardian.cs" />
+    <Compile Include="World\Creatures\Dwarf.cs" />
     <Compile Include="World\Items\HeadwearBase.cs" />
     <Compile Include="World\Items\Inventory.cs" />
     <Compile Include="World\Items\ItemBase.cs" />

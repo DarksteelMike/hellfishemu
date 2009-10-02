@@ -21,10 +21,20 @@ namespace Guardian_Roguelike.States
 
         private int SkipTurns;
 
+        private bool SkipAI;
+
         private int TurnsPassed;
+
+        private int LevelNumber;
+
+        private DateTime DEBUG_PerformanceTime;
+
+        private int DEBUG_PassedMilliseconds;
 
         public GameState() : base()
         {
+            DEBUG_PassedMilliseconds = 0;
+            SkipAI = false;
             CurMode = Modes.Normal;
             if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_MessageLog"))
             {
@@ -67,6 +77,8 @@ namespace Guardian_Roguelike.States
             MsgLog.AddMsg("Get running, " + Player.Name + "!");
 
             TurnsPassed = SkipTurns = 0;
+
+            LevelNumber = 1;
         }
 
         public override void EnterState()
@@ -77,6 +89,7 @@ namespace Guardian_Roguelike.States
         public override void MainLoop()
         {            
             libtcodWrapper.KeyPress key;
+            CurrentLevel.CalculateVisible(Player.Position.X, Player.Position.Y);
             Render();
             while (true)
             {                
@@ -87,12 +100,22 @@ namespace Guardian_Roguelike.States
                     break;
                 }
 
-                do
+                DEBUG_PerformanceTime = DateTime.Now;
+                CurrentLevel.CalculateVisible(Player.Position.X, Player.Position.Y);
+                if (!SkipAI)
                 {
-                    AI();
-                    Render();
-                    TurnsPassed++;
-                } while (SkipTurns-- > 0);
+                    do
+                    {
+                        
+                        AI();
+                        Render();
+                        TurnsPassed++;
+                    } while (SkipTurns-- > 0);
+                }
+                DEBUG_PassedMilliseconds = DateTime.Now.Millisecond - DEBUG_PerformanceTime.Millisecond;
+                libtcodWrapper.RootConsole.WindowTitle = "Run, Urist, Run! Time: " + DEBUG_PassedMilliseconds.ToString() + "ms";
+
+                SkipAI = false;
             }
         }
 
@@ -107,6 +130,7 @@ namespace Guardian_Roguelike.States
             MapCons.Blit(0, 0, 90, 30, Root, 1, 5);
 
             StatusCons.PrintLine("HP: " + Player.HP.ToString() + "/" + Player.MaxHP.ToString() + "  Turn: " + TurnsPassed.ToString(),0,0,libtcodWrapper.LineAlignment.Left);
+            StatusCons.PrintLine("Level " + LevelNumber.ToString(), 0, 1, libtcodWrapper.LineAlignment.Left);
             StatusCons.Blit(0, 0, 90, 5, Root, 0, 35);
 
             Root.Flush();
@@ -188,19 +212,23 @@ namespace Guardian_Roguelike.States
                 {
                     switch (DR)
                     {
-                        case(World.DestroyResults.AlreadyEmpty):
+                        case (World.DestroyResults.AlreadyEmpty):
                             MsgLog.AddMsg("You swing at the air,predictably hitting nothing, and stumble forward.");
                             break;
-                        case(World.DestroyResults.Cancelled):
+                        case (World.DestroyResults.Cancelled):
                             MsgLog.AddMsg("You lower your pick again.");
                             break;
-                        case(World.DestroyResults.Indestructible):
-                            MsgLog.AddMsg("You swing with all your strength, but the pick bounces off the wall without doing damage.");
+                        case (World.DestroyResults.Indestructible):
+                            MsgLog.AddMsg("You swing with all your strength, but the pick bounces off the wall without doing damage.", libtcodWrapper.Color.FromRGB(255, 0, 0));
                             break;
-                        case(World.DestroyResults.Success):
+                        case (World.DestroyResults.Success):
                             MsgLog.AddMsg("The rock crumbles under the might of your pick.");
                             break;
                     }
+                }
+                else
+                {
+                    SkipAI = true;
                 }
                 return false;
             }
@@ -239,15 +267,9 @@ namespace Guardian_Roguelike.States
 
             switch ((char)KP.Character)
             {
-                case('d'):
-                    MsgLog.AddMsg("Debug!");
-                    break;
                 case('m'):
+                    //View Messagelog
                     StateManager.QueueState(StateManager.PersistentStates["MessageLogMenuState"]);
-                    return true;
-                    break;
-                case('w'):
-                    StateManager.QueueState(StateManager.PersistentStates["WorldMapMenuState"]);
                     return true;
                     break;
                 case('s'):
@@ -255,8 +277,29 @@ namespace Guardian_Roguelike.States
                     break;
 
                 case('t'): //All-round testing button
+                    //Enter Portal
+                    if (CurrentLevel.CheckType(Player.Position) == Guardian_Roguelike.World.TerrainTypes.ExitPortal)
+                    {
+                        CurrentLevel = new Guardian_Roguelike.World.Map();
+                        Utilities.InterStateResources.Instance.Resources["Game_CurrentLevel"] = CurrentLevel;
+                        MapCons.Clear();
+                        CurrentLevel.Creatures.Add(Player);
+                        Player.Level = CurrentLevel;
+                        LevelNumber++;
+                        MsgLog.AddMsg("You descend deeper into the pit...");
+                    }
+                    else
+                    {
+                        MsgLog.AddMsg("There are no stairs here!");
+                    }
+                    break;
+
+                case('d'):
+                    //Dig
+                    //TODO: Require pick item in inventory. (Wielded? Boil down to "Swing" command?)
                     MsgLog.AddMsg("Dig in which direction?");
                     CurMode = Modes.Digging;
+                    SkipAI = true;
                     break;
             }
 
@@ -265,8 +308,6 @@ namespace Guardian_Roguelike.States
 
         public override void ExitState()
         {
-            MapCons.Dispose();
-            
         }
     }
 }
