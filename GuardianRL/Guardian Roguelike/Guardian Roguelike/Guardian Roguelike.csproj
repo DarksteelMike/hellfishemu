@@ -37,6 +37,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI\AIBase.cs" />
+    <Compile Include="AI\FSM_Aggressive.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -76,9 +78,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Premise.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="AI\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

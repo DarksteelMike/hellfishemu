@@ -32,7 +32,7 @@ namespace Guardian_Roguelike.World.Creatures
         public int Faction;
 
         //AI Stuff
-        //public
+        public AI.AIBase MyAI;
 
         public CreatureBase()
         {
@@ -44,6 +44,10 @@ namespace Guardian_Roguelike.World.Creatures
         }
 
         #region Movement Methods
+        public void Move(System.Drawing.Point p)
+        {
+            Move(p.X, p.Y);
+        }
         public void Move(int X, int Y)
         {
 
@@ -143,7 +147,9 @@ namespace Guardian_Roguelike.World.Creatures
 
         public void AI()
         {
-            return;
+            Log.AddMsg(Name + " takes a turn. " + Position.ToString());
+            MyAI.TakeTurn();
+            Log.AddMsg(Name + " took a turn. " + Position.ToString());
         }
 
     }

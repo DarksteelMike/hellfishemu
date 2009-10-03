@@ -40,11 +40,19 @@ namespace Guardian_Roguelike.States
             {
                 Utilities.InterStateResources.Instance.Resources.Add("Game_MessageLog", new Utilities.MessageLog());
             }
-
+            if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_FOVHandler"))
+            {
+                Utilities.InterStateResources.Instance.Resources.Add("Game_FOVHandler", new libtcodWrapper.TCODFov(90, 30));
+            }
+            if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_PathFinder"))
+            {
+                Utilities.InterStateResources.Instance.Resources.Add("Game_PathFinder", new libtcodWrapper.TCODPathFinding((libtcodWrapper.TCODFov)Utilities.InterStateResources.Instance.Resources["Game_FOVHandler"], 1));
+            }
             if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_CurrentLevel"))
             {
                 Utilities.InterStateResources.Instance.Resources.Add("Game_CurrentLevel", new World.Map());
-            }
+            }            
+            
             World.Creatures.Dwarf tPlayer = new Guardian_Roguelike.World.Creatures.Dwarf();
             tPlayer.Position.X = tPlayer.Position.Y = 1;
             tPlayer.Name = "Urist";
@@ -272,20 +280,16 @@ namespace Guardian_Roguelike.States
                     StateManager.QueueState(StateManager.PersistentStates["MessageLogMenuState"]);
                     return true;
                     break;
-                case('s'):
-                    CurrentLevel.DEBUG_Savemap("dbg.txt");
+                case('s')://Debug key
+                    MsgLog.AddMsg(CurrentLevel.Creatures[1].Name + " is in " + ((global::Guardian_Roguelike.AI.FSM_Aggressive)CurrentLevel.Creatures[1].MyAI).CurState.ToString() + " mode " + CurrentLevel.Creatures[1].Position.ToString());
+                    //System.Windows.Forms.MessageBox.Show(Math.Sqrt(Math.Pow(CurrentLevel.Creatures[1].Position.X-Player.Position.X,2) + Math.Pow(CurrentLevel.Creatures[1].Position.Y-Player.Position.Y,2)).ToString());                    
                     break;
 
                 case('t'): //All-round testing button
                     //Enter Portal
                     if (CurrentLevel.CheckType(Player.Position) == Guardian_Roguelike.World.TerrainTypes.ExitPortal)
                     {
-                        CurrentLevel = new Guardian_Roguelike.World.Map();
-                        Utilities.InterStateResources.Instance.Resources["Game_CurrentLevel"] = CurrentLevel;
-                        MapCons.Clear();
-                        CurrentLevel.Creatures.Add(Player);
-                        Player.Level = CurrentLevel;
-                        LevelNumber++;
+                        MakeNewMap();
                         MsgLog.AddMsg("You descend deeper into the pit...");
                     }
                     else
@@ -304,6 +308,36 @@ namespace Guardian_Roguelike.States
             }
 
             return false;
+        }
+
+        private void MakeNewMap()
+        {
+            CurrentLevel = new Guardian_Roguelike.World.Map();
+            Utilities.InterStateResources.Instance.Resources["Game_CurrentLevel"] = CurrentLevel;
+            MapCons.Clear();
+            CurrentLevel.Creatures.Add(Player);
+            Player.Level = CurrentLevel;
+            CurrentLevel.DestroyTile(Player.Position);
+            LevelNumber++;
+
+            //Place a dwarf randomly
+            Random RandGen = new Random();
+            while (true)
+            {
+                int dx = RandGen.Next(0, 90);
+                int dy = RandGen.Next(0, 30);
+
+                if (CurrentLevel.CheckWalkable(dx, dy))
+                {
+                    World.Creatures.Dwarf Olon = new World.Creatures.Dwarf();
+                    Olon.Level = CurrentLevel;
+                    Olon.Name = "Olon";
+                    Olon.Position = new System.Drawing.Point(dx, dy);
+                    Olon.MyAI = new AI.FSM_Aggressive(Olon);
+                    CurrentLevel.Creatures.Add(Olon);
+                    break;
+                }
+            }
         }
 
         public override void ExitState()

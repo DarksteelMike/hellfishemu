@@ -16,10 +16,12 @@ namespace Guardian_Roguelike.World
         public List<Creatures.CreatureBase> Creatures;
 
         private libtcodWrapper.TCODFov FOVHandler;
+        private libtcodWrapper.TCODPathFinding PathFinder;
 
         public Map()
         {
-            FOVHandler = new libtcodWrapper.TCODFov(WIDTH,HEIGHT);
+            FOVHandler = (libtcodWrapper.TCODFov)Utilities.InterStateResources.Instance.Resources["Game_FOVHandler"];
+            PathFinder = (libtcodWrapper.TCODPathFinding)Utilities.InterStateResources.Instance.Resources["Game_PathFinder"];
             Creatures = new List<Guardian_Roguelike.World.Creatures.CreatureBase>();
             if (RandGen == null)
             {
@@ -101,6 +103,8 @@ namespace Guardian_Roguelike.World
             ExitY = RandGen.Next(1, HEIGHT-1);
 
             DisplayData[ExitX, ExitY] = TerrainTile.Create(TerrainTypes.ExitPortal);
+
+            
 
             UpdateTCODMap();
         }

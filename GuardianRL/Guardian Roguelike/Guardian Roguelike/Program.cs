@@ -12,7 +12,6 @@ namespace Guardian_Roguelike
         [STAThread]
         static void Main()
         {
-
             libtcodWrapper.RootConsole.Fullscreen = false;
             libtcodWrapper.RootConsole.Width = 92;
             libtcodWrapper.RootConsole.Height = 40;
@@ -22,7 +21,7 @@ namespace Guardian_Roguelike
             States.StateManager.PersistentStates.Add("GameState", new States.GameState());
             States.StateManager.PersistentStates.Add("QuitState", new States.QuitState());
             States.StateManager.PersistentStates.Add("MessageLogMenuState",new States.MessageLogMenuState());
-            
+
             States.StateManager.ChangeState(States.StateManager.PersistentStates["MainMenuState"]);
         }
     }

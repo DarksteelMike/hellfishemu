@@ -8,7 +8,7 @@ namespace Guardian_Roguelike.World.Creatures
     {
         public Dwarf() : base()
         {
-            CharRepresentation = '@';
+            CharRepresentation = 'D';
             DrawColor = libtcodWrapper.ColorPresets.Aqua;
             this.Type = CreatureTypes.Dwarf;
         }

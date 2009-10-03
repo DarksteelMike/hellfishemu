@@ -8,6 +8,16 @@ namespace Guardian_Roguelike.Utilities
     {
         private static Random RndGen = new Random();
 
+        public static System.Drawing.Point AddPoints(System.Drawing.Point p1, System.Drawing.Point p2)
+        {
+            return new System.Drawing.Point(p1.X + p2.X, p1.Y + p2.Y);
+        }
+
+        public static System.Drawing.Point SubtractPoints(System.Drawing.Point p1, System.Drawing.Point p2)
+        {
+            return new System.Drawing.Point(p1.X - p2.X, p1.Y - p2.Y);
+        }
+
         public static void Copy2DArray<TArrType>(TArrType[,] From, ref TArrType[,] To,int W,int H)
         {
             for (int x = 0; x < W; x++)
