@@ -30,6 +30,8 @@ namespace Guardian_Roguelike.World.Creatures
         public Utilities.MessageLog Log;
         public CreatureTypes Type;
         public int Faction;
+        public Items.Inventory InventoryHandler;
+        public System.Drawing.Bitmap HitAreas;
 
         //AI Stuff
         public AI.AIBase MyAI;
@@ -50,7 +52,6 @@ namespace Guardian_Roguelike.World.Creatures
         }
         public void Move(int X, int Y)
         {
-
             System.Drawing.Point LocalPosToCheck = new System.Drawing.Point();
 
             LocalPosToCheck.X = Position.X + X;
@@ -147,17 +148,37 @@ namespace Guardian_Roguelike.World.Creatures
 
         public void AI()
         {
-            Log.AddMsg(Name + " takes a turn. " + Position.ToString());
             MyAI.TakeTurn();
-            Log.AddMsg(Name + " took a turn. " + Position.ToString());
         }
 
-    }
+        public void Attack(CreatureBase Target)
+        {
+            Random RndGen = new Random(DateTime.Now.Millisecond);
+            double ChanceToHit = ((((double)BaseAim - (double)Target.BaseSpeed)+(double)RndGen.Next(1,10)) / (double)10) * (double)100;
+            int DamageDone = 0;
 
-    public struct AILoveHateFearCreatureSet
-    {
-        public float Love_Fear;
-        public float Hate;
-        public CreatureBase SubjectCreature;
+            if (RndGen.Next(0, 100) < ChanceToHit)//HIT!
+            {
+                DamageDone = (BaseStrength - Target.BaseVigor) + RndGen.Next(1, 10);
+            }
+
+            System.Drawing.Color CurBodypartTarget = System.Drawing.Color.Gray;
+            while (Utilities.GeneralMethods.CompareColors(CurBodypartTarget, System.Drawing.Color.Gray))
+            {
+                int x = RndGen.Next(0, HitAreas.Width);
+                int y = RndGen.Next(0, HitAreas.Height);
+
+                CurBodypartTarget = Target.HitAreas.GetPixel(x, y);
+            }
+            Log.AddMsg(Name + " strikes " + Target.Name + " in the " + Utilities.GeneralMethods.ColorToBodypart(CurBodypartTarget));
+            Target.Damage(DamageDone,Utilities.GeneralMethods.ColorToBodypart(CurBodypartTarget));
+        }
+
+        public void Damage(int Amount,string BodyPart)
+        {
+            //TODO: Apply defensive bonuses from Armor and such.
+            HP -= Amount;
+            //TODO: Handle Death
+        }
     }
 }

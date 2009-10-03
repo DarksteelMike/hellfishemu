@@ -1,0 +1,11 @@
+128,128,128 = Nothing
+0,255,0 = Head
+255,0,0 = Torso
+0,0,255 = Left Arm
+255,255,0 = Right Arm
+255,0,255 = Left Leg
+0,255,255 = Right Leg
+255,255,255 = Left Hand
+0,0,0 = Right Hand
+128,0,0 = Left Foot
+0,128,0 = Right Foot

@@ -91,20 +91,20 @@ namespace Guardian_Roguelike.AI
                             CurFollowPathIndex = 0; //And start from the beginning of it!
                         }
                     }
-                    if (CurFollowPathIndex >= 0 && CurFollowPathIndex < CurFollowPath.Count)//We're on the way to the player (Or where we saw him last)
+                    if (CurFollowPathIndex >= 0 && CurFollowPathIndex < CurFollowPath.Count-1)//We're on the way to the player (Or where we saw him last)
                     {
                         LinkedCreature.Move(CurFollowPath[CurFollowPathIndex].X - LinkedCreature.Position.X, CurFollowPath[CurFollowPathIndex].Y - LinkedCreature.Position.Y);
                     }
                     CurFollowPathIndex++;
-                    if (Math.Sqrt(Math.Pow(LinkedCreature.Position.X-Player.Position.X,2) + Math.Pow(LinkedCreature.Position.Y-Player.Position.Y,2)) == 1)
+                    if (Utilities.GeneralMethods.Distance(LinkedCreature.Position,Player.Position) == 1) //We're in stabby range!
                     {
-                        CurState = AIState.Attack;
+                        CurState = AIState.Attack; //ATTACK!!!!
                     }
-                    if (CurFollowPathIndex == CurFollowPath.Count && !FOVHandler.CheckTileFOV(Player.Position.X, Player.Position.Y))
+                    if (CurFollowPathIndex == CurFollowPath.Count-1 && !FOVHandler.CheckTileFOV(Player.Position.X, Player.Position.Y)) //We're there but he's gone! We can't see him!
                     {
                         CurState = AIState.Wander;
                     }
-                    if (LinkedCreature.HP <= LinkedCreature.MaxHP / 3)
+                    if (LinkedCreature.HP <= LinkedCreature.MaxHP / 3) //Ack! We've been wounded!
                     {
                         CurState = AIState.Flee;
                     }
@@ -112,7 +112,8 @@ namespace Guardian_Roguelike.AI
 
                 case(AIState.Attack):
                     MsgLog.AddMsg(LinkedCreature.Name + " swings at you!");
-                    if (Math.Sqrt(Math.Pow(LinkedCreature.Position.X - Player.Position.X, 2) + Math.Pow(LinkedCreature.Position.Y - Player.Position.Y, 2)) != 1)
+                    LinkedCreature.Attack(Player);
+                    if (Utilities.GeneralMethods.Distance(LinkedCreature.Position, Player.Position) != 1)
                     {
                         CurState = AIState.Follow;
                     }

@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Drawing;
+using System.Reflection;
+using System.IO;
 
 namespace Guardian_Roguelike.Utilities
 {
@@ -11,11 +14,24 @@ namespace Guardian_Roguelike.Utilities
         public static System.Drawing.Point AddPoints(System.Drawing.Point p1, System.Drawing.Point p2)
         {
             return new System.Drawing.Point(p1.X + p2.X, p1.Y + p2.Y);
-        }
-
+        }       
         public static System.Drawing.Point SubtractPoints(System.Drawing.Point p1, System.Drawing.Point p2)
         {
             return new System.Drawing.Point(p1.X - p2.X, p1.Y - p2.Y);
+        }
+
+        public static int Distance(System.Drawing.Point p1, System.Drawing.Point p2)
+        {
+            return (int)Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
+        }
+
+        public static Bitmap LoadBitmapFromAssembly(string ImageName)
+        {
+            Assembly ExecAssembly = Assembly.GetExecutingAssembly();
+
+            Stream ImgStream = ExecAssembly.GetManifestResourceStream("Guardian_Roguelike." + ImageName);
+
+            return new Bitmap(ImgStream);
         }
 
         public static void Copy2DArray<TArrType>(TArrType[,] From, ref TArrType[,] To,int W,int H)
@@ -27,6 +43,57 @@ namespace Guardian_Roguelike.Utilities
                     To[x, y] = From[x, y];
                 }
             }
+        }
+
+        public static bool CompareColors(System.Drawing.Color C1, System.Drawing.Color C2)
+        {
+            return (C1.A == C2.A && C1.R == C2.R && C1.G == C2.G && C1.B == C2.B);
+        }
+
+        public static string ColorToBodypart(System.Drawing.Color C)
+        {
+            if(CompareColors(C,System.Drawing.Color.FromArgb(255, 0, 0)))
+            {
+                return "Torso";
+            }
+            if (CompareColors(C, System.Drawing.Color.FromArgb(0, 255, 0)))
+            {
+                return "Head";
+            }
+            if (CompareColors(C, System.Drawing.Color.FromArgb(0, 0, 255)))
+            {
+                return "Left Arm";
+            }
+            if (CompareColors(C, System.Drawing.Color.FromArgb(255, 255, 0)))
+            {
+                return "Right Arm";
+            }
+            if (CompareColors(C, System.Drawing.Color.FromArgb(255, 0, 255)))
+            {
+                return "Left Leg";
+            }
+            if (CompareColors(C, System.Drawing.Color.FromArgb(0, 255, 255)))
+            {
+                return "Right Leg";
+            }
+            if (CompareColors(C, System.Drawing.Color.FromArgb(255, 255, 255)))
+            {
+                return "Left Hand";
+            }
+            if (CompareColors(C, System.Drawing.Color.FromArgb(0, 0, 0)))
+            {
+                return "Right Hand";
+            }
+            if (CompareColors(C, System.Drawing.Color.FromArgb(128, 0, 0)))
+            {
+                return "Left Foot";
+            }
+            if (CompareColors(C, System.Drawing.Color.FromArgb(0, 128, 0)))
+            {
+                return "Right Foot";
+            }
+
+            return "ummm... epidermis? {" + C.A + "," + C.R + "," + C.G + "," + C.B + "}";
         }
 
         public static List<System.Drawing.Point> CalcBresenhamLine(System.Drawing.Point Start, System.Drawing.Point End)

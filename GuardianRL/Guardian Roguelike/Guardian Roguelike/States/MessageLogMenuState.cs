@@ -38,7 +38,16 @@ namespace Guardian_Roguelike.States
             Scrollability = MsgLog.RenderFullToConsole(MsgCons, ScrollValue);
 
             MsgCons.Blit(0, 0, 90, 30, Root, 0, 5);
-            Root.PrintLine("Press <Enter> or <Escape> to return.", 1, 31, libtcodWrapper.LineAlignment.Left);
+            Root.PrintLine("Press <Enter> or <Escape> to return.", 1, 36, libtcodWrapper.LineAlignment.Left);
+
+            if ((Scrollability == Guardian_Roguelike.Utilities.MessageLogScrollPossibilities.Up || Scrollability == Guardian_Roguelike.Utilities.MessageLogScrollPossibilities.Both))
+            {
+                Root.PutChar(90, 6, '^');
+            }
+            if (Scrollability == Guardian_Roguelike.Utilities.MessageLogScrollPossibilities.Down || Scrollability == Guardian_Roguelike.Utilities.MessageLogScrollPossibilities.Both)
+            {
+                Root.PutChar(90, 34, 'v');
+            }
 
             Root.Flush();
         }

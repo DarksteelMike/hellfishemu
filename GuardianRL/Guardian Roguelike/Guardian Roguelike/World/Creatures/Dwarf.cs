@@ -11,6 +11,7 @@ namespace Guardian_Roguelike.World.Creatures
             CharRepresentation = 'D';
             DrawColor = libtcodWrapper.ColorPresets.Aqua;
             this.Type = CreatureTypes.Dwarf;
+            HitAreas = Utilities.GeneralMethods.LoadBitmapFromAssembly("HAMaps.HitArea - Dwarf.bmp");
         }
     }
 }

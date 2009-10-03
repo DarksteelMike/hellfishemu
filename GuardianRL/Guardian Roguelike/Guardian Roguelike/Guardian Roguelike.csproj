@@ -69,14 +69,20 @@
     <Compile Include="Utilities\GeneralMethods.cs" />
     <Compile Include="Utilities\InterStateResources.cs" />
     <Compile Include="Utilities\MessageLog.cs" />
+    <Compile Include="Utilities\NotableEventsLog.cs" />
     <Compile Include="World\Creatures\CreatureBase.cs" />
     <Compile Include="World\Creatures\Dwarf.cs" />
     <Compile Include="World\Items\HeadwearBase.cs" />
     <Compile Include="World\Items\Inventory.cs" />
     <Compile Include="World\Items\ItemBase.cs" />
+    <Compile Include="World\Items\ShieldBase.cs" />
+    <Compile Include="World\Items\WeaponBase.cs" />
+    <Compile Include="World\Items\WieldableBase.cs" />
     <Compile Include="World\Map.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="HAMaps\HitArea - Dwarf.bmp" />
+    <Content Include="HitAreas Color Notes.txt" />
     <Content Include="Premise.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

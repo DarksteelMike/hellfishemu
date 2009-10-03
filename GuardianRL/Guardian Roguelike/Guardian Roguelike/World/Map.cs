@@ -296,6 +296,13 @@ namespace Guardian_Roguelike.World
         }
         public bool CheckWalkable(int x, int y)
         {
+            foreach (World.Creatures.CreatureBase c in Creatures)
+            {
+                if (c.Position.X == x && c.Position.Y == y)
+                {
+                    return false;
+                }
+            }
             return DisplayData[x,y].Walkable;
         }
 
@@ -315,6 +322,40 @@ namespace Guardian_Roguelike.World
         public TerrainTypes CheckType(int x, int y)
         {
             return DisplayData[x, y].Type;
+        }
+
+        public bool CheckContainsCreature(System.Drawing.Point p)
+        {
+            return CheckContainsCreature(p.X, p.Y);
+        }
+        public bool CheckContainsCreature(int x, int y)
+        {
+            foreach (World.Creatures.CreatureBase C in Creatures)
+            {
+                if (C.Position.X == x && C.Position.Y == y)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public World.Creatures.CreatureBase GetCreatureAt(System.Drawing.Point p)
+        {
+            return GetCreatureAt(p.X, p.Y);
+        }
+        public World.Creatures.CreatureBase GetCreatureAt(int x, int y)
+        {
+            foreach (World.Creatures.CreatureBase C in Creatures)
+            {
+                if (C.Position.X == x && C.Position.Y == y)
+                {
+                    return C;
+                }
+            }
+
+            return null;
         }
 
         public void DEBUG_Savemap(string Filename)

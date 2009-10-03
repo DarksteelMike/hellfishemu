@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Guardian_Roguelike.States
 {
-    public enum Modes { Normal, Digging };
+    public enum Modes { Normal, Swinging, HasDug };
     class GameState : StateBase
     {
         private World.Map CurrentLevel;
@@ -157,66 +157,131 @@ namespace Guardian_Roguelike.States
 
         private bool ProcessInput(libtcodWrapper.KeyPress KP)
         {
-            if (CurMode == Modes.Digging)
+            if (CurMode == Modes.Swinging)
             {
+                
                 World.DestroyResults DR = Guardian_Roguelike.World.DestroyResults.Cancelled;
                 switch (KP.KeyCode)
                 {
                     case (libtcodWrapper.KeyCode.TCODK_HOME):
-                        DR = CurrentLevel.DestroyTile(Player.Position.X - 1, Player.Position.Y - 1);
-                        Player.MoveUpLeft();
-                        CurMode = Modes.Normal;
-                        SkipTurns = 2;
+                        if (CurrentLevel.CheckContainsCreature(Player.Position.X - 1, Player.Position.Y - 1))
+                        {
+                            Player.Attack(CurrentLevel.GetCreatureAt(Player.Position.X - 1, Player.Position.Y - 1));
+                            CurMode = Modes.Normal;
+                        }
+                        else
+                        {
+                            DR = CurrentLevel.DestroyTile(Player.Position.X - 1, Player.Position.Y - 1);
+                            Player.MoveUpLeft();
+                            CurMode = Modes.HasDug;
+                            SkipTurns = 2;
+                        }
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_UP):
-                        DR = CurrentLevel.DestroyTile(Player.Position.X, Player.Position.Y - 1);
-                        Player.MoveUp();
-                        CurMode = Modes.Normal;
-                        SkipTurns = 2;
+                        if (CurrentLevel.CheckContainsCreature(Player.Position.X, Player.Position.Y - 1))
+                        {
+                            Player.Attack(CurrentLevel.GetCreatureAt(Player.Position.X, Player.Position.Y - 1));
+                            CurMode = Modes.Normal;
+                        }
+                        else
+                        {
+                            DR = CurrentLevel.DestroyTile(Player.Position.X, Player.Position.Y - 1);
+                            Player.MoveUp();
+                            CurMode = Modes.HasDug;
+                            SkipTurns = 2;
+                        }
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_PAGEUP):
-                        DR = CurrentLevel.DestroyTile(Player.Position.X + 1, Player.Position.Y - 1);
-                        Player.MoveUpRight();
-                        CurMode = Modes.Normal;
-                        SkipTurns = 2;
+                        if (CurrentLevel.CheckContainsCreature(Player.Position.X + 1, Player.Position.Y - 1))
+                        {
+                            Player.Attack(CurrentLevel.GetCreatureAt(Player.Position.X + 1, Player.Position.Y - 1));
+                            CurMode = Modes.Normal;
+                        }
+                        else
+                        {
+                            DR = CurrentLevel.DestroyTile(Player.Position.X + 1, Player.Position.Y - 1);
+                            Player.MoveUpRight();
+                            CurMode = Modes.HasDug;
+                            SkipTurns = 2;
+                        }
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_RIGHT):
-                        DR = CurrentLevel.DestroyTile(Player.Position.X + 1, Player.Position.Y);
-                        Player.MoveRight();
-                        CurMode = Modes.Normal;
-                        SkipTurns = 2;
+                        if (CurrentLevel.CheckContainsCreature(Player.Position.X + 1, Player.Position.Y))
+                        {
+                            Player.Attack(CurrentLevel.GetCreatureAt(Player.Position.X + 1, Player.Position.Y));
+                            CurMode = Modes.Normal;
+                        }
+                        else
+                        {
+                            DR = CurrentLevel.DestroyTile(Player.Position.X + 1, Player.Position.Y);
+                            Player.MoveRight();
+                            CurMode = Modes.HasDug;
+                            SkipTurns = 2;
+                        }
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_PAGEDOWN):
-                        DR = CurrentLevel.DestroyTile(Player.Position.X + 1, Player.Position.Y + 1);
-                        Player.MoveDownRight();
-                        CurMode = Modes.Normal;
-                        SkipTurns = 2;
+                        if (CurrentLevel.CheckContainsCreature(Player.Position.X + 1, Player.Position.Y + 1))
+                        {
+                            Player.Attack(CurrentLevel.GetCreatureAt(Player.Position.X + 1, Player.Position.Y + 1));
+                            CurMode = Modes.Normal;
+                        }
+                        else
+                        {
+                            DR = CurrentLevel.DestroyTile(Player.Position.X + 1, Player.Position.Y + 1);
+                            Player.MoveDownRight();
+                            CurMode = Modes.HasDug;
+                            SkipTurns = 2;
+                        }
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_DOWN):
-                        DR = CurrentLevel.DestroyTile(Player.Position.X, Player.Position.Y + 1);
-                        Player.MoveDown();
-                        CurMode = Modes.Normal;
-                        SkipTurns = 2;
+                        if (CurrentLevel.CheckContainsCreature(Player.Position.X, Player.Position.Y + 1))
+                        {
+                            Player.Attack(CurrentLevel.GetCreatureAt(Player.Position.X, Player.Position.Y + 1));
+                            CurMode = Modes.Normal;
+                        }
+                        else
+                        {
+                            DR = CurrentLevel.DestroyTile(Player.Position.X, Player.Position.Y + 1);
+                            Player.MoveDown();
+                            CurMode = Modes.HasDug;
+                            SkipTurns = 2;
+                        }
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_END):
-                        DR = CurrentLevel.DestroyTile(Player.Position.X - 1, Player.Position.Y + 1);
-                        Player.MoveDownLeft();
-                        CurMode = Modes.Normal;
-                        SkipTurns = 2;
+                        if (CurrentLevel.CheckContainsCreature(Player.Position.X - 1, Player.Position.Y + 1))
+                        {
+                            Player.Attack(CurrentLevel.GetCreatureAt(Player.Position.X - 1, Player.Position.Y + 1));
+                            CurMode = Modes.Normal;
+                        }
+                        else
+                        {
+                            DR = CurrentLevel.DestroyTile(Player.Position.X - 1, Player.Position.Y + 1);
+                            Player.MoveDownLeft();
+                            CurMode = Modes.HasDug;
+                            SkipTurns = 2;
+                        }
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_LEFT):
-                        DR = CurrentLevel.DestroyTile(Player.Position.X - 1, Player.Position.Y);
-                        Player.MoveLeft();
-                        CurMode = Modes.Normal;
-                        SkipTurns = 2;
+                        if (CurrentLevel.CheckContainsCreature(Player.Position.X - 1, Player.Position.Y))
+                        {
+                            Player.Attack(CurrentLevel.GetCreatureAt(Player.Position.X - 1, Player.Position.Y));
+                            CurMode = Modes.Normal;
+                        }
+                        else
+                        {
+                            DR = CurrentLevel.DestroyTile(Player.Position.X - 1, Player.Position.Y);
+                            Player.MoveLeft();
+                            CurMode = Modes.HasDug;
+                            SkipTurns = 2;
+                        }
                         break;
                     case (libtcodWrapper.KeyCode.TCODK_ESCAPE):
                         CurMode = Modes.Normal;
                         break;
                 }
 
-                //Diggin *was* attempted, add appropriate message to log
-                if (CurMode == Modes.Normal)
+                //Digging was attempted, add appropriate message to log
+                if (CurMode == Modes.HasDug)
                 {
                     switch (DR)
                     {
@@ -233,10 +298,7 @@ namespace Guardian_Roguelike.States
                             MsgLog.AddMsg("The rock crumbles under the might of your pick.");
                             break;
                     }
-                }
-                else
-                {
-                    SkipAI = true;
+                    CurMode = Modes.Normal;
                 }
                 return false;
             }
@@ -280,9 +342,9 @@ namespace Guardian_Roguelike.States
                     StateManager.QueueState(StateManager.PersistentStates["MessageLogMenuState"]);
                     return true;
                     break;
-                case('s')://Debug key
+                case('d')://Debug key
                     MsgLog.AddMsg(CurrentLevel.Creatures[1].Name + " is in " + ((global::Guardian_Roguelike.AI.FSM_Aggressive)CurrentLevel.Creatures[1].MyAI).CurState.ToString() + " mode " + CurrentLevel.Creatures[1].Position.ToString());
-                    //System.Windows.Forms.MessageBox.Show(Math.Sqrt(Math.Pow(CurrentLevel.Creatures[1].Position.X-Player.Position.X,2) + Math.Pow(CurrentLevel.Creatures[1].Position.Y-Player.Position.Y,2)).ToString());                    
+                    System.Windows.Forms.MessageBox.Show(Math.Sqrt(Math.Pow(CurrentLevel.Creatures[1].Position.X-Player.Position.X,2) + Math.Pow(CurrentLevel.Creatures[1].Position.Y-Player.Position.Y,2)).ToString());                    
                     break;
 
                 case('t'): //All-round testing button
@@ -298,11 +360,12 @@ namespace Guardian_Roguelike.States
                     }
                     break;
 
-                case('d'):
-                    //Dig
-                    //TODO: Require pick item in inventory. (Wielded? Boil down to "Swing" command?)
-                    MsgLog.AddMsg("Dig in which direction?");
-                    CurMode = Modes.Digging;
+                case('s'):
+                    //Swing
+                    //TODO: Check what is wielded.Assumes pick for now
+
+                    MsgLog.AddMsg("Swing in which direction?");
+                    CurMode = Modes.Swinging;
                     SkipAI = true;
                     break;
             }
