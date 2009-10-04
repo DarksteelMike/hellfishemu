@@ -36,31 +36,48 @@ namespace Guardian_Roguelike.States
             DEBUG_PassedMilliseconds = 0;
             SkipAI = false;
             CurMode = Modes.Normal;
-            if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_MessageLog"))
+            if (Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_MessageLog"))
             {
-                Utilities.InterStateResources.Instance.Resources.Add("Game_MessageLog", new Utilities.MessageLog());
+                Utilities.InterStateResources.Instance.Resources.Remove("Game_MessageLog");
             }
-            if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_FOVHandler"))
+            if (Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_FOVHandler"))
             {
-                Utilities.InterStateResources.Instance.Resources.Add("Game_FOVHandler", new libtcodWrapper.TCODFov(90, 30));
+                Utilities.InterStateResources.Instance.Resources.Remove("Game_FOVHandler");
             }
-            if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_PathFinder"))
+            if (Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_PathFinder"))
             {
-                Utilities.InterStateResources.Instance.Resources.Add("Game_PathFinder", new libtcodWrapper.TCODPathFinding((libtcodWrapper.TCODFov)Utilities.InterStateResources.Instance.Resources["Game_FOVHandler"], 1));
+                Utilities.InterStateResources.Instance.Resources.Remove("Game_PathFinder");
             }
-            if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_CurrentLevel"))
+            if (Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_CurrentLevel"))
             {
-                Utilities.InterStateResources.Instance.Resources.Add("Game_CurrentLevel", new World.Map());
-            }            
+                Utilities.InterStateResources.Instance.Resources.Remove("Game_CurrentLevel");
+            }
+            if (Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_NotableEventsLog"))
+            {
+                Utilities.InterStateResources.Instance.Resources.Remove("Game_NotableEventsLog");
+            }
+
+            Utilities.InterStateResources.Instance.Resources.Add("Game_MessageLog", new Utilities.MessageLog());
+            Utilities.InterStateResources.Instance.Resources.Add("Game_FOVHandler", new libtcodWrapper.TCODFov(90, 30));
+            Utilities.InterStateResources.Instance.Resources.Add("Game_PathFinder", new libtcodWrapper.TCODPathFinding((libtcodWrapper.TCODFov)Utilities.InterStateResources.Instance.Resources["Game_FOVHandler"], 1));
+            Utilities.InterStateResources.Instance.Resources.Add("Game_CurrentLevel", new World.Map());
+            Utilities.InterStateResources.Instance.Resources.Add("Game_NotableEventsLog", new Utilities.NotableEventsLog());
             
+            /*
             World.Creatures.Dwarf tPlayer = new Guardian_Roguelike.World.Creatures.Dwarf();
             tPlayer.Position.X = tPlayer.Position.Y = 1;
-            tPlayer.Name = "Urist";
-            tPlayer.DrawColor = libtcodWrapper.ColorPresets.ForestGreen;
-            if (!Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_PlayerCreature"))
+            tPlayer.FirstName = "Urist";
+            tPlayer.LastName = "Litasterar";
+            tPlayer.DrawColor = libtcodWrapper.ColorPresets.ForestGreen;*/
+            if (Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_PlayerCreature"))
             {
-                Utilities.InterStateResources.Instance.Resources.Add("Game_PlayerCreature", tPlayer);
+                Utilities.InterStateResources.Instance.Resources.Remove("Game_PlayerCreature");
             }
+            World.Creatures.CreatureBase tPlayer = new World.Creatures.Dwarf();
+            tPlayer.Generate();
+            tPlayer.DrawColor = libtcodWrapper.ColorPresets.ForestGreen;
+
+            Utilities.InterStateResources.Instance.Resources.Add("Game_PlayerCreature", tPlayer);
 
             StatusCons = libtcodWrapper.RootConsole.GetNewConsole(90, 5);
 
@@ -82,7 +99,7 @@ namespace Guardian_Roguelike.States
             */
             Player.Position = CurrentLevel.GetFirstWalkable();
 
-            MsgLog.AddMsg("Get running, " + Player.Name + "!");
+            MsgLog.AddMsg("Get running, " + Player.FirstName + "!");
 
             TurnsPassed = SkipTurns = 0;
 
@@ -124,6 +141,14 @@ namespace Guardian_Roguelike.States
                 libtcodWrapper.RootConsole.WindowTitle = "Run, Urist, Run! Time: " + DEBUG_PassedMilliseconds.ToString() + "ms";
 
                 SkipAI = false;
+                if (Player.HP <= 0)
+                {
+                    States.DeathData DD = (States.DeathData)Utilities.InterStateResources.Instance.Resources["Game_DeathData"];
+                    DD.LevelsDescended = LevelNumber;
+                    DD.TurnsSurvived = TurnsPassed;
+                    StateManager.QueueState(StateManager.PersistentStates["GameOverState"]);
+                    break;
+                }
             }
         }
 
@@ -139,6 +164,7 @@ namespace Guardian_Roguelike.States
 
             StatusCons.PrintLine("HP: " + Player.HP.ToString() + "/" + Player.MaxHP.ToString() + "  Turn: " + TurnsPassed.ToString(),0,0,libtcodWrapper.LineAlignment.Left);
             StatusCons.PrintLine("Level " + LevelNumber.ToString(), 0, 1, libtcodWrapper.LineAlignment.Left);
+            StatusCons.PrintLine("V:" + Player.BaseVigor.ToString() + " E:" + Player.BaseEnergy.ToString() + " Sp:" + Player.BaseSpeed.ToString() + " St:" + Player.BaseStrength.ToString() + " A:" + Player.BaseAim.ToString(), 0, 2, libtcodWrapper.LineAlignment.Left);
             StatusCons.Blit(0, 0, 90, 5, Root, 0, 35);
 
             Root.Flush();
@@ -343,8 +369,7 @@ namespace Guardian_Roguelike.States
                     return true;
                     break;
                 case('d')://Debug key
-                    MsgLog.AddMsg(CurrentLevel.Creatures[1].Name + " is in " + ((global::Guardian_Roguelike.AI.FSM_Aggressive)CurrentLevel.Creatures[1].MyAI).CurState.ToString() + " mode " + CurrentLevel.Creatures[1].Position.ToString());
-                    System.Windows.Forms.MessageBox.Show(Math.Sqrt(Math.Pow(CurrentLevel.Creatures[1].Position.X-Player.Position.X,2) + Math.Pow(CurrentLevel.Creatures[1].Position.Y-Player.Position.Y,2)).ToString());                    
+                    MsgLog.AddMsg(CurrentLevel.Creatures[1].FirstName + " is in " + ((global::Guardian_Roguelike.AI.FSM_Aggressive)CurrentLevel.Creatures[1].MyAI).CurState.ToString() + " mode " + CurrentLevel.Creatures[1].Position.ToString());
                     break;
 
                 case('t'): //All-round testing button
@@ -394,7 +419,7 @@ namespace Guardian_Roguelike.States
                 {
                     World.Creatures.Dwarf Olon = new World.Creatures.Dwarf();
                     Olon.Level = CurrentLevel;
-                    Olon.Name = "Olon";
+                    Olon.FirstName = "Olon";
                     Olon.Position = new System.Drawing.Point(dx, dy);
                     Olon.MyAI = new AI.FSM_Aggressive(Olon);
                     CurrentLevel.Creatures.Add(Olon);

@@ -6,7 +6,7 @@ namespace Guardian_Roguelike.Utilities
 {
     class NotableEventsLog
     {
-        private List<NotableEvent> NotableEvents;
+        public List<NotableEvent> NotableEvents;
 
         public NotableEventsLog()
         {

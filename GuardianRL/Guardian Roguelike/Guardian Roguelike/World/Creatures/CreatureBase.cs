@@ -11,7 +11,8 @@ namespace Guardian_Roguelike.World.Creatures
     public abstract class CreatureBase
     {
         //Stats
-        public string Name;
+        public string FirstName;
+        public string LastName;
         public int HP;
         public int MaxHP;
         public int BaseVigor;
@@ -32,6 +33,7 @@ namespace Guardian_Roguelike.World.Creatures
         public int Faction;
         public Items.Inventory InventoryHandler;
         public System.Drawing.Bitmap HitAreas;
+        protected Random RndGen;
 
         //AI Stuff
         public AI.AIBase MyAI;
@@ -39,7 +41,9 @@ namespace Guardian_Roguelike.World.Creatures
         public CreatureBase()
         {
             HP = MaxHP = 100;
-            BaseVigor = BaseEnergy = BaseSpeed = BaseAim = BaseStrength = 7;
+            BaseVigor = BaseEnergy = BaseSpeed = BaseAim = BaseStrength = 5;
+
+            RndGen = new Random((int)DateTime.Now.Ticks);
 
             Level = (Map)Utilities.InterStateResources.Instance.Resources["Game_CurrentLevel"];
             Log = (Utilities.MessageLog)Utilities.InterStateResources.Instance.Resources["Game_MessageLog"];
@@ -170,8 +174,20 @@ namespace Guardian_Roguelike.World.Creatures
 
                 CurBodypartTarget = Target.HitAreas.GetPixel(x, y);
             }
-            Log.AddMsg(Name + " strikes " + Target.Name + " in the " + Utilities.GeneralMethods.ColorToBodypart(CurBodypartTarget));
+            Log.AddMsg(FirstName + " strikes " + Target.FirstName + " in the " + Utilities.GeneralMethods.ColorToBodypart(CurBodypartTarget));
             Target.Damage(DamageDone,Utilities.GeneralMethods.ColorToBodypart(CurBodypartTarget));
+
+            
+            if (Target.HP <= 0)
+            {
+                States.DeathData DD = new Guardian_Roguelike.States.DeathData(Target, this, 0, 0);
+
+                if(Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_DeathData"))
+                {
+                    Utilities.InterStateResources.Instance.Resources.Remove("Game_DeathData");
+                }
+                Utilities.InterStateResources.Instance.Resources.Add("Game_DeathData",DD);
+            }
         }
 
         public void Damage(int Amount,string BodyPart)
@@ -180,5 +196,7 @@ namespace Guardian_Roguelike.World.Creatures
             HP -= Amount;
             //TODO: Handle Death
         }
+
+        public abstract void Generate();
     }
 }

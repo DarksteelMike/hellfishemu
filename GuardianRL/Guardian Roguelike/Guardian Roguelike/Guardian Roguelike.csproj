@@ -60,6 +60,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="States\CreateCharacterMenuState.cs" />
+    <Compile Include="States\GameOverMenuState.cs" />
     <Compile Include="States\GameState.cs" />
     <Compile Include="States\MainMenuState.cs" />
     <Compile Include="States\MessageLogMenuState.cs" />
@@ -81,10 +82,21 @@
     <Compile Include="World\Map.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="HAMaps\HitArea - Dwarf.bmp" />
+    <Content Include="HAMaps\HitArea - Dwarf.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Goals.txt" />
     <Content Include="HitAreas Color Notes.txt" />
+    <Content Include="libtcod.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libtcodWrapper.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Premise.txt" />
+    <Content Include="terminal.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

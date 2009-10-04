@@ -28,7 +28,7 @@ namespace Guardian_Roguelike.States
 
         public override void ExitState()
         {
-            Player.Name = Name;
+            Player.FirstName = Name;
         }
     }
 }

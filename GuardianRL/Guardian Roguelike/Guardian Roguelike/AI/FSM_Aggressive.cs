@@ -111,7 +111,7 @@ namespace Guardian_Roguelike.AI
                     break;
 
                 case(AIState.Attack):
-                    MsgLog.AddMsg(LinkedCreature.Name + " swings at you!");
+                    MsgLog.AddMsg(LinkedCreature.FirstName + " swings at you!");
                     LinkedCreature.Attack(Player);
                     if (Utilities.GeneralMethods.Distance(LinkedCreature.Position, Player.Position) != 1)
                     {

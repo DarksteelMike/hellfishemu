@@ -1,14 +1,19 @@
 *Map Generation
 	*Generate Creatures
+		*DONE:
+		*STARTED: Dwarfs
+		*NEEDED: 
 *Handle Death
 	*Game Over Menu State
 	*Morgue (NotableEventsLog)
 *Handle Inventory
-	*Headwear,Armor,Gloves,Boots,Leggings,Shoulder Pads
+	*Wearables
+		*Headwear,Armor,Gloves,Boots,Leggings,Shoulder Pads
 	*Wieldables
 		*Bucklers,Shields,Picks(Special,allows digging),Maces,Swords,Axes,Daggers,Hammers,Crossbows,Bows
 	*Other stuff
 		*Food?
+		*Corpses?
 		*Ammo (Arrows,Bolts)
 *More AI versions.
 *Ranged Combat.
