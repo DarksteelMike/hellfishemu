@@ -296,14 +296,7 @@ namespace Guardian_Roguelike.World
         }
         public bool CheckWalkable(int x, int y)
         {
-            foreach (World.Creatures.CreatureBase c in Creatures)
-            {
-                if (c.Position.X == x && c.Position.Y == y)
-                {
-                    return false;
-                }
-            }
-            return DisplayData[x,y].Walkable;
+            return DisplayData[x,y].Walkable && !CheckContainsCreature(x,y);
         }
 
         public bool CheckSeeThrough(System.Drawing.Point p)

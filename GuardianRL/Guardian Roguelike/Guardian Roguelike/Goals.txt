@@ -1,0 +1,14 @@
+*Map Generation
+	*Generate Creatures
+*Handle Death
+	*Game Over Menu State
+	*Morgue (NotableEventsLog)
+*Handle Inventory
+	*Headwear,Armor,Gloves,Boots,Leggings,Shoulder Pads
+	*Wieldables
+		*Bucklers,Shields,Picks(Special,allows digging),Maces,Swords,Axes,Daggers,Hammers,Crossbows,Bows
+	*Other stuff
+		*Food?
+		*Ammo (Arrows,Bolts)
+*More AI versions.
+*Ranged Combat.
