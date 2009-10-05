@@ -34,6 +34,7 @@ namespace Guardian_Roguelike.World.Creatures
         public Items.Inventory InventoryHandler;
         public System.Drawing.Bitmap HitAreas;
         protected Random RndGen;
+        protected libtcodWrapper.TCODFov FOVHandler;
 
         //AI Stuff
         public AI.AIBase MyAI;
@@ -47,6 +48,7 @@ namespace Guardian_Roguelike.World.Creatures
 
             Level = (Map)Utilities.InterStateResources.Instance.Resources["Game_CurrentLevel"];
             Log = (Utilities.MessageLog)Utilities.InterStateResources.Instance.Resources["Game_MessageLog"];
+            FOVHandler = (libtcodWrapper.TCODFov)Utilities.InterStateResources.Instance.Resources["Game_FOVHandler"];
         }
 
         #region Movement Methods
@@ -131,23 +133,12 @@ namespace Guardian_Roguelike.World.Creatures
 
         public bool CanSeeCell(System.Drawing.Point Coords)
         {
-            //Is cell inside circleofsight?
-            if ((Math.Pow((double)(Coords.X - Position.X), (double)2) + Math.Pow((double)(Coords.Y - Position.Y), (double)2)) < (Math.Pow(Math.Round((double)BaseAim + 1, 0), (double)2)))
-            {
-                foreach (System.Drawing.Point P in Utilities.GeneralMethods.CalcBresenhamLine(Position, Coords))
-                {
-                    if (!Level.CheckSeeThrough(P))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return CanSeeCell(Coords.X, Coords.Y);
+        }
+        public bool CanSeeCell(int X, int Y)
+        {
+            FOVHandler.CalculateFOV(Position.X, Position.Y, BaseAim, true, libtcodWrapper.FovAlgorithm.Basic);
+            return FOVHandler.CheckTileFOV(X, Y);
         }
 
         public void AI()
@@ -178,7 +169,7 @@ namespace Guardian_Roguelike.World.Creatures
             Target.Damage(DamageDone,Utilities.GeneralMethods.ColorToBodypart(CurBodypartTarget));
 
             
-            if (Target.HP <= 0)
+            if (!Target.IsAlive())
             {
                 States.DeathData DD = new Guardian_Roguelike.States.DeathData(Target, this, 0, 0);
 
@@ -194,7 +185,16 @@ namespace Guardian_Roguelike.World.Creatures
         {
             //TODO: Apply defensive bonuses from Armor and such.
             HP -= Amount;
-            //TODO: Handle Death
+
+            if (HP <= 0)
+            {
+                CharRepresentation = CharRepresentation.ToString().ToLower()[0];
+            }
+        }
+
+        public bool IsAlive()
+        {
+            return HP >= 0;
         }
 
         public abstract void Generate();

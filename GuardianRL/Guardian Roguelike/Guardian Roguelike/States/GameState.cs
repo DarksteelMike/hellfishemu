@@ -87,6 +87,13 @@ namespace Guardian_Roguelike.States
             MsgLog = (Utilities.MessageLog)Utilities.InterStateResources.Instance.Resources["Game_MessageLog"];
 
             Player = (World.Creatures.Dwarf)Utilities.InterStateResources.Instance.Resources["Game_PlayerCreature"];
+            Player.BaseAim += 2;
+            Player.BaseEnergy += 2;
+            Player.BaseSpeed += 2;
+            Player.BaseStrength += 2;
+            Player.BaseVigor += 2;
+            Player.FirstName = "Urist";
+            Player.LastName = "Litasterar";
 
             CurrentLevel = (World.Map)Utilities.InterStateResources.Instance.Resources["Game_CurrentLevel"];
             CurrentLevel.Creatures.Add(Player);
@@ -114,7 +121,7 @@ namespace Guardian_Roguelike.States
         public override void MainLoop()
         {            
             libtcodWrapper.KeyPress key;
-            CurrentLevel.CalculateVisible(Player.Position.X, Player.Position.Y);
+            CurrentLevel.CalculateVisible(Player.Position.X, Player.Position.Y,Player.BaseAim);
             Render();
             while (true)
             {                
@@ -126,7 +133,7 @@ namespace Guardian_Roguelike.States
                 }
 
                 DEBUG_PerformanceTime = DateTime.Now;
-                CurrentLevel.CalculateVisible(Player.Position.X, Player.Position.Y);
+                CurrentLevel.CalculateVisible(Player.Position.X, Player.Position.Y,Player.BaseAim);
                 if (!SkipAI)
                 {
                     do
@@ -174,7 +181,7 @@ namespace Guardian_Roguelike.States
         {
             foreach (World.Creatures.CreatureBase c in CurrentLevel.Creatures)
             {
-                if (!c.Equals(Player))
+                if (!c.Equals(Player) && c.IsAlive())
                 {
                     c.AI();
                 }
@@ -388,10 +395,14 @@ namespace Guardian_Roguelike.States
                 case('s'):
                     //Swing
                     //TODO: Check what is wielded.Assumes pick for now
-
                     MsgLog.AddMsg("Swing in which direction?");
                     CurMode = Modes.Swinging;
                     SkipAI = true;
+                    break;
+                case('l'):
+                    //Look
+                    CurrentLevel.CalculateVisible(Player.Position, Player.BaseAim);
+                    CurrentLevel.PostLookMessages(MsgLog);
                     break;
             }
 
@@ -418,8 +429,7 @@ namespace Guardian_Roguelike.States
                 if (CurrentLevel.CheckWalkable(dx, dy))
                 {
                     World.Creatures.Dwarf Olon = new World.Creatures.Dwarf();
-                    Olon.Level = CurrentLevel;
-                    Olon.FirstName = "Olon";
+                    Olon.Generate();
                     Olon.Position = new System.Drawing.Point(dx, dy);
                     Olon.MyAI = new AI.FSM_Aggressive(Olon);
                     CurrentLevel.Creatures.Add(Olon);

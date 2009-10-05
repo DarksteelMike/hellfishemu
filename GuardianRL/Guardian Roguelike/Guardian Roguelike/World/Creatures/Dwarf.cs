@@ -16,9 +16,7 @@ namespace Guardian_Roguelike.World.Creatures
 
         public override void Generate()
         {
-
-
-            BaseAim = BaseEnergy = BaseSpeed = BaseStrength = BaseVigor = 5;
+            BaseAim = BaseEnergy = BaseSpeed = BaseStrength = BaseVigor = 2;
             #region Add variance to stats
             if (RndGen.Next(0, 100) < 10)
             {

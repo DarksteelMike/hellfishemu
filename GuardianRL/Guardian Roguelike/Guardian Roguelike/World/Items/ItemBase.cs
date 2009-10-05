@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Guardian_Roguelike.World.Items
 {
-    abstract class ItemBase
+    public abstract class ItemBase
     {
         public abstract bool Equippable
         {

@@ -20,7 +20,7 @@ namespace Guardian_Roguelike.States
 
             SW.WriteLine(Data.Player.FirstName + ", the level 0 Dwarf");
             SW.WriteLine("He survived for " + Data.TurnsSurvived + " turns and descended " + Data.LevelsDescended + " levels into the pit.");
-            SW.WriteLine("He was killed by " + Data.Killer.FirstName + " the " + Data.Killer.Type.ToString());
+            SW.WriteLine("He was killed by " + Data.Killer.FirstName + " " + Data.Killer.LastName + " the " + Data.Killer.Type.ToString());
             SW.WriteLine("Notable Events:");
             foreach (Utilities.NotableEvent NE in NEL.NotableEvents)
             {
@@ -46,8 +46,9 @@ namespace Guardian_Roguelike.States
         public void Render()
         {
             Root.Clear();
-            Root.PrintLine("You have died. Read all about your death in " + Filename + "!", 10, 10, libtcodWrapper.LineAlignment.Left);
-            Root.PrintLine("Tell your friends! Press Enter or Escape to continue.", 10,11, libtcodWrapper.LineAlignment.Left);
+            Root.PrintLine("You have died. Read all about your death in ", 10, 10, libtcodWrapper.LineAlignment.Left);
+            Root.PrintLine(Filename, 10, 11, libtcodWrapper.LineAlignment.Left);
+            Root.PrintLine("Tell your friends! Press Enter or Escape to continue.", 10,12, libtcodWrapper.LineAlignment.Left);
             Root.Flush();
         }
 

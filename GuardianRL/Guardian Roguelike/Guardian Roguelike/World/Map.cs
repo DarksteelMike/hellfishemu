@@ -14,6 +14,7 @@ namespace Guardian_Roguelike.World
         //private bool[,] SeeThroughData;
 
         public List<Creatures.CreatureBase> Creatures;
+        public List<Items.ItemBase>[,] ItemPiles;
 
         private libtcodWrapper.TCODFov FOVHandler;
         private libtcodWrapper.TCODPathFinding PathFinder;
@@ -23,6 +24,7 @@ namespace Guardian_Roguelike.World
             FOVHandler = (libtcodWrapper.TCODFov)Utilities.InterStateResources.Instance.Resources["Game_FOVHandler"];
             PathFinder = (libtcodWrapper.TCODPathFinding)Utilities.InterStateResources.Instance.Resources["Game_PathFinder"];
             Creatures = new List<Guardian_Roguelike.World.Creatures.CreatureBase>();
+            ItemPiles = new List<Guardian_Roguelike.World.Items.ItemBase>[WIDTH, HEIGHT];
             if (RandGen == null)
             {
                 RandGen = new Random(System.DateTime.Now.Millisecond);
@@ -280,12 +282,13 @@ namespace Guardian_Roguelike.World
                 }
             }
 
-            foreach (World.Creatures.CreatureBase C in Creatures)
+            for(int i=Creatures.Count-1;i>=0;i--)
             {
+                World.Creatures.CreatureBase C = Creatures[i];
                 if (DisplayData[C.Position.X, C.Position.Y].IsVisible)
                 {
-                    Target.ForegroundColor = C.DrawColor;
-                    Target.PutChar(C.Position.X, C.Position.Y, C.CharRepresentation);
+                    Target.PutChar(C.Position.X, C.Position.Y,
+                    Target.ForegroundColor = C.DrawColor; C.CharRepresentation);
                 }
             }
         }
@@ -325,7 +328,7 @@ namespace Guardian_Roguelike.World
         {
             foreach (World.Creatures.CreatureBase C in Creatures)
             {
-                if (C.Position.X == x && C.Position.Y == y)
+                if (C.Position.X == x && C.Position.Y == y && C.IsAlive())
                 {
                     return true;
                 }
@@ -387,13 +390,13 @@ namespace Guardian_Roguelike.World
             }
         }
 
-        public void CalculateVisible(System.Drawing.Point From)
+        public void CalculateVisible(System.Drawing.Point From,int Radius)
         {
-            CalculateVisible(From.X, From.Y);
+            CalculateVisible(From.X, From.Y,Radius);
         }
-        public void CalculateVisible(int FromX, int FromY)
+        public void CalculateVisible(int FromX, int FromY,int Radius)
         {
-            FOVHandler.CalculateFOV(FromX, FromY, 0, true, libtcodWrapper.FovAlgorithm.Basic);
+            FOVHandler.CalculateFOV(FromX, FromY, Radius, true, libtcodWrapper.FovAlgorithm.Basic);
             for (int x = 0; x < 90; x++)
             {
                 for (int y = 0; y < 30; y++)
@@ -419,6 +422,37 @@ namespace Guardian_Roguelike.World
                 {
                     FOVHandler.SetCell(x, y, DisplayData[x, y].Seethrough, DisplayData[x, y].Walkable);
                 }
+            }
+        }
+
+        public void PostLookMessages(Utilities.MessageLog TargetLog)
+        {
+            bool HasSeen = false;
+            TargetLog.AddMsg("You see: ");
+            for (int x = 0; x < WIDTH; x++)
+            {
+                for (int y = 0; y < HEIGHT; y++)
+                {
+                    if (FOVHandler.CheckTileFOV(x, y))
+                    {
+                        foreach (World.Creatures.CreatureBase C in Creatures)
+                        {
+                            if (C.Position.X == x && C.Position.Y == y)
+                            {
+                                string Msg = C.FirstName + " " + C.LastName + " the " + C.Type.ToString();
+                                TargetLog.AddMsg(Msg);
+                                HasSeen = true;
+                            }
+                        }
+                    }
+
+                    //TODO: Handle items and item piles!
+                }
+            }
+
+            if (!HasSeen)
+            {
+                TargetLog.AddMsg("Nothing");
             }
         }
     }
