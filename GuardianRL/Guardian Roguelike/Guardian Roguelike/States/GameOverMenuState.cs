@@ -10,7 +10,7 @@ namespace Guardian_Roguelike.States
 
         public override void EnterState()
         {
-            DeathData Data = (DeathData)Utilities.InterStateResources.Instance.Resources["Game_DeathData"];
+            Utilities.DeathData Data = (Utilities.DeathData)Utilities.InterStateResources.Instance.Resources["Game_DeathData"];
             Utilities.NotableEventsLog NEL = (Utilities.NotableEventsLog)Utilities.InterStateResources.Instance.Resources["Game_NotableEventsLog"];
 
             Filename = DateTime.Now.Date.ToString() + " - " + DateTime.Now.TimeOfDay.ToString() + ".txt";
@@ -18,11 +18,11 @@ namespace Guardian_Roguelike.States
             Filename = System.Windows.Forms.Application.ExecutablePath.Substring(0, System.Windows.Forms.Application.ExecutablePath.LastIndexOf('\\')+1) + "morgues\\" + Filename;
             System.IO.StreamWriter SW = new System.IO.StreamWriter(Filename);
 
-            SW.WriteLine(Data.Player.FirstName + ", the level 0 Dwarf");
+            SW.WriteLine(Data.Player.FirstName + " " + Data.Player.LastName + ", the level 0 Dwarf");
             SW.WriteLine("He survived for " + Data.TurnsSurvived + " turns and descended " + Data.LevelsDescended + " levels into the pit.");
-            SW.WriteLine("He was killed by " + Data.Killer.FirstName + " " + Data.Killer.LastName + " the " + Data.Killer.Type.ToString());
+            SW.WriteLine("He was killed by " + Data.Killer.FirstName + " " + Data.Killer.LastName + " the " + Data.Killer.Type.ToString().Replace('_',' '));
             SW.WriteLine("Notable Events:");
-            foreach (Utilities.NotableEvent NE in NEL.NotableEvents)
+            foreach (Utilities.NotableEvent NE in Utilities.NotableEventsLog.NotableEvents)
             {
                 SW.WriteLine(NE.Turn.ToString() + ": " + NE.Description);
             }
@@ -66,23 +66,6 @@ namespace Guardian_Roguelike.States
 
         public override void ExitState()
         {
-
-        }
-    }
-
-    public class DeathData
-    {
-        public World.Creatures.CreatureBase Player;
-        public World.Creatures.CreatureBase Killer;
-        public int TurnsSurvived;
-        public int LevelsDescended;
-
-        public DeathData(World.Creatures.CreatureBase p, World.Creatures.CreatureBase k, int t, int l)
-        {
-            Player = p;
-            Killer = k;
-            TurnsSurvived = t;
-            LevelsDescended = l;
 
         }
     }

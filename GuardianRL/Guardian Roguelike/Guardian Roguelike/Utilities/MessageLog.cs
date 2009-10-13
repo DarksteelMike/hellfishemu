@@ -18,21 +18,21 @@ namespace Guardian_Roguelike.Utilities
         }
     }
 
-    public class MessageLog
+    public abstract class MessageLog
     {
-        private List<Message> Lines;
+        private static List<Message> Lines = new List<Message>();
 
-        public MessageLog()
-        {
-            Lines = new List<Message>();
-        }
-
-        public void AddMsg(string Msg)
+        public static void AddMsg(string Msg)
         {
             AddMsg(Msg, libtcodWrapper.Color.FromRGB(255, 255, 255));
         }
 
-        public void AddMsg(string Msg, libtcodWrapper.Color Col)
+        public static void Clear()
+        {
+            Lines.Clear();
+        }
+
+        public static void AddMsg(string Msg, libtcodWrapper.Color Col)
         {
             Lines.Add(new Message(Msg,Col));
 
@@ -41,7 +41,7 @@ namespace Guardian_Roguelike.Utilities
                 Lines.RemoveAt(0);
             }
         }
-        public void RenderRecentToConsole(libtcodWrapper.Console Target)
+        public static void RenderRecentToConsole(libtcodWrapper.Console Target)
         {
             Target.Clear();
 
@@ -58,7 +58,7 @@ namespace Guardian_Roguelike.Utilities
         /// <param name="Target">Target console.</param>
         /// <param name="Scroll">How much to scroll down.</param>
         /// <returns>Which way can be scrolled.</returns>
-        public MessageLogScrollPossibilities RenderFullToConsole(libtcodWrapper.Console Target, int Scroll)
+        public static MessageLogScrollPossibilities RenderFullToConsole(libtcodWrapper.Console Target, int Scroll)
         {
             Target.Clear();
 

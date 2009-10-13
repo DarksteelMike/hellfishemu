@@ -35,7 +35,7 @@ namespace Guardian_Roguelike.States
         private void Render()
         {
             Root.Clear();
-            Scrollability = MsgLog.RenderFullToConsole(MsgCons, ScrollValue);
+            Scrollability = Utilities.MessageLog.RenderFullToConsole(MsgCons, ScrollValue);
 
             MsgCons.Blit(0, 0, 90, 30, Root, 0, 5);
             Root.PrintLine("Press <Enter> or <Escape> to return.", 1, 36, libtcodWrapper.LineAlignment.Left);

@@ -67,12 +67,22 @@
     <Compile Include="States\QuitState.cs" />
     <Compile Include="States\StateBase.cs" />
     <Compile Include="States\StateManager.cs" />
+    <Compile Include="Utilities\DeathData.cs" />
     <Compile Include="Utilities\GeneralMethods.cs" />
     <Compile Include="Utilities\InterStateResources.cs" />
     <Compile Include="Utilities\MessageLog.cs" />
     <Compile Include="Utilities\NotableEventsLog.cs" />
     <Compile Include="World\Creatures\CreatureBase.cs" />
     <Compile Include="World\Creatures\Dwarf.cs" />
+    <Compile Include="World\Creatures\GiantRat.cs" />
+    <Compile Include="World\Creatures\Limbs\Arm.cs" />
+    <Compile Include="World\Creatures\Limbs\Foot.cs" />
+    <Compile Include="World\Creatures\Limbs\Hand.cs" />
+    <Compile Include="World\Creatures\Limbs\Head.cs" />
+    <Compile Include="World\Creatures\Limbs\Leg.cs" />
+    <Compile Include="World\Creatures\Limbs\LimbBase.cs" />
+    <Compile Include="World\Creatures\Limbs\Tail.cs" />
+    <Compile Include="World\Creatures\Limbs\Torso.cs" />
     <Compile Include="World\Items\HeadwearBase.cs" />
     <Compile Include="World\Items\Inventory.cs" />
     <Compile Include="World\Items\ItemBase.cs" />
@@ -82,9 +92,6 @@
     <Compile Include="World\Map.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="HAMaps\HitArea - Dwarf.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Goals.txt" />
     <Content Include="HitAreas Color Notes.txt" />
     <Content Include="libtcod.dll">

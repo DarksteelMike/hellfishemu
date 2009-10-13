@@ -4,9 +4,10 @@ using System.Text;
 
 namespace Guardian_Roguelike.World.Items
 {
+    public enum ItemType { Headwear,BodyArmor,Glove,ShoulderPad,Legging,Boot,Weapon,Shield };
     public abstract class ItemBase
     {
-        public abstract bool Equippable
+        public abstract bool Wearable
         {
             get;
         }
@@ -18,6 +19,18 @@ namespace Guardian_Roguelike.World.Items
         {
             get;
         }
+        public abstract bool Wieldable
+        {
+            get;
+        }
+
+        public abstract ItemType Type
+        {
+            get;
+        }
+
+        public int Damage;
+        public int ArmorClass;
 
         public abstract void OnEquip();
 

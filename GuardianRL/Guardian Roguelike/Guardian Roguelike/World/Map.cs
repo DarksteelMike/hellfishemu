@@ -287,8 +287,8 @@ namespace Guardian_Roguelike.World
                 World.Creatures.CreatureBase C = Creatures[i];
                 if (DisplayData[C.Position.X, C.Position.Y].IsVisible)
                 {
-                    Target.PutChar(C.Position.X, C.Position.Y,
-                    Target.ForegroundColor = C.DrawColor; C.CharRepresentation);
+                    Target.ForegroundColor = C.DrawColor;
+                    Target.PutChar(C.Position.X, C.Position.Y,C.CharRepresentation);
                 }
             }
         }
@@ -425,10 +425,10 @@ namespace Guardian_Roguelike.World
             }
         }
 
-        public void PostLookMessages(Utilities.MessageLog TargetLog)
+        public void PostLookMessages()
         {
             bool HasSeen = false;
-            TargetLog.AddMsg("You see: ");
+            Utilities.MessageLog.AddMsg("You see: ");
             for (int x = 0; x < WIDTH; x++)
             {
                 for (int y = 0; y < HEIGHT; y++)
@@ -440,7 +440,7 @@ namespace Guardian_Roguelike.World
                             if (C.Position.X == x && C.Position.Y == y)
                             {
                                 string Msg = C.FirstName + " " + C.LastName + " the " + C.Type.ToString();
-                                TargetLog.AddMsg(Msg);
+                                Utilities.MessageLog.AddMsg(Msg);
                                 HasSeen = true;
                             }
                         }
@@ -452,7 +452,7 @@ namespace Guardian_Roguelike.World
 
             if (!HasSeen)
             {
-                TargetLog.AddMsg("Nothing");
+                Utilities.MessageLog.AddMsg("Nothing");
             }
         }
     }

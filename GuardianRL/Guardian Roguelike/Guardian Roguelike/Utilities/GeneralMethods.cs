@@ -11,6 +11,21 @@ namespace Guardian_Roguelike.Utilities
     {
         private static Random RndGen = new Random();
 
+        public static string RemoveLowerCaseAndNonAlpha(string s)
+        {
+            string ret = "";
+
+            foreach (char c in s)
+            {
+                if (char.IsUpper(c) && char.IsLetter(c))
+                {
+                    ret += c;
+                }
+            }
+
+            return ret;
+        }
+
         public static System.Drawing.Point AddPoints(System.Drawing.Point p1, System.Drawing.Point p2)
         {
             return new System.Drawing.Point(p1.X + p2.X, p1.Y + p2.Y);

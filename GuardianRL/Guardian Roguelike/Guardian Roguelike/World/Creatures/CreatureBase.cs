@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Guardian_Roguelike.World.Creatures.Limbs;
 
 namespace Guardian_Roguelike.World.Creatures
 {
-    public enum CreatureTypes { Dwarf, Human, Sheep, Goblin, Elf };
+    public enum CreatureTypes { Dwarf, Human, Sheep, Goblin, Elf, Giant_Rat };
     public enum Deity { Earth, Wind, Fire, Water, Pagan };
     public enum AIState { Wandering, Tracking, Attacking, Fleeing };
     
@@ -13,8 +14,6 @@ namespace Guardian_Roguelike.World.Creatures
         //Stats
         public string FirstName;
         public string LastName;
-        public int HP;
-        public int MaxHP;
         public int BaseVigor;
         public int BaseEnergy;
         public int BaseSpeed;
@@ -28,7 +27,6 @@ namespace Guardian_Roguelike.World.Creatures
 
         //Internal Stuffis
         public Map Level;
-        public Utilities.MessageLog Log;
         public CreatureTypes Type;
         public int Faction;
         public Items.Inventory InventoryHandler;
@@ -36,19 +34,28 @@ namespace Guardian_Roguelike.World.Creatures
         protected Random RndGen;
         protected libtcodWrapper.TCODFov FOVHandler;
 
+        //Limb-related stuff
+        public List<Limbs.LimbBase> Limbs;
+        public List<Limbs.LimbDependency> LimbDependencies;
+        public List<Limbs.LimbBase> PreferredLimbAttackOrder;
+        public int LimbProbabilitySum;
+
         //AI Stuff
         public AI.AIBase MyAI;
 
         public CreatureBase()
         {
-            HP = MaxHP = 100;
             BaseVigor = BaseEnergy = BaseSpeed = BaseAim = BaseStrength = 5;
 
             RndGen = new Random((int)DateTime.Now.Ticks);
 
             Level = (Map)Utilities.InterStateResources.Instance.Resources["Game_CurrentLevel"];
-            Log = (Utilities.MessageLog)Utilities.InterStateResources.Instance.Resources["Game_MessageLog"];
+            
             FOVHandler = (libtcodWrapper.TCODFov)Utilities.InterStateResources.Instance.Resources["Game_FOVHandler"];
+
+            Limbs = new List<Guardian_Roguelike.World.Creatures.Limbs.LimbBase>();
+            LimbDependencies = new List<Guardian_Roguelike.World.Creatures.Limbs.LimbDependency>();
+            PreferredLimbAttackOrder = new List<Guardian_Roguelike.World.Creatures.Limbs.LimbBase>();
         }
 
         #region Movement Methods
@@ -105,31 +112,19 @@ namespace Guardian_Roguelike.World.Creatures
         }
         #endregion
 
-        #region AI Helper Methods
-        public float PhysicalCondition
+        public void EnforceLimbDependencies()
         {
-            get
+            foreach (World.Creatures.Limbs.LimbDependency Dep in LimbDependencies)
             {
-                return (float)(HP / MaxHP);
+                if (Dep.TargetLimb.HP >= 0)
+                {
+                    if (Dep.RequiredLimb.HP <= 0)
+                    {
+                        Dep.TargetLimb.HP = 0;
+                    }
+                }
             }
         }
-
-        public float PercievedStrength
-        {
-            get
-            {
-                return (float)(PhysicalCondition * BaseStrength);
-            }
-        }
-
-        public float PercievedDanger
-        {
-            get
-            {
-                return PercievedStrength;
-            }
-        }
-        #endregion
 
         public bool CanSeeCell(System.Drawing.Point Coords)
         {
@@ -149,52 +144,88 @@ namespace Guardian_Roguelike.World.Creatures
         public void Attack(CreatureBase Target)
         {
             Random RndGen = new Random(DateTime.Now.Millisecond);
-            double ChanceToHit = ((((double)BaseAim - (double)Target.BaseSpeed)+(double)RndGen.Next(1,10)) / (double)10) * (double)100;
+            double ChanceToHit = (((double)BaseAim - (double)Target.BaseSpeed) + (double)RndGen.Next(1,10)) / (double)10 * (double)100;
             int DamageDone = 0;
-
-            if (RndGen.Next(0, 100) < ChanceToHit)//HIT!
-            {
-                DamageDone = (BaseStrength - Target.BaseVigor) + RndGen.Next(1, 10);
-            }
-
-            System.Drawing.Color CurBodypartTarget = System.Drawing.Color.Gray;
-            while (Utilities.GeneralMethods.CompareColors(CurBodypartTarget, System.Drawing.Color.Gray))
-            {
-                int x = RndGen.Next(0, HitAreas.Width);
-                int y = RndGen.Next(0, HitAreas.Height);
-
-                CurBodypartTarget = Target.HitAreas.GetPixel(x, y);
-            }
-            Log.AddMsg(FirstName + " strikes " + Target.FirstName + " in the " + Utilities.GeneralMethods.ColorToBodypart(CurBodypartTarget));
-            Target.Damage(DamageDone,Utilities.GeneralMethods.ColorToBodypart(CurBodypartTarget));
-
             
-            if (!Target.IsAlive())
+            if (RndGen.Next(0, 100) > ChanceToHit)//Miss
             {
-                States.DeathData DD = new Guardian_Roguelike.States.DeathData(Target, this, 0, 0);
+                Utilities.MessageLog.AddMsg(FirstName + " swings at " + Target.FirstName + " with a precision that leaves something to be desired.");
+                return;
+            }
 
-                if(Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_DeathData"))
+            //Pick limb to use for attack
+            bool HasPickedALimb = false;
+            while(!HasPickedALimb)
+            {
+                foreach(LimbBase Limb in PreferredLimbAttackOrder)
                 {
-                    Utilities.InterStateResources.Instance.Resources.Remove("Game_DeathData");
+                    if(RndGen.Next(0,100) < 95)
+                    {
+                        DamageDone = Limb.AttackWith();
+                        HasPickedALimb = true;
+                        break;
+                    }
                 }
-                Utilities.InterStateResources.Instance.Resources.Add("Game_DeathData",DD);
             }
-        }
 
-        public void Damage(int Amount,string BodyPart)
-        {
-            //TODO: Apply defensive bonuses from Armor and such.
-            HP -= Amount;
-
-            if (HP <= 0)
+            //Pick limb on target to strike
+            HasPickedALimb = false;
+            while(!HasPickedALimb)
             {
-                CharRepresentation = CharRepresentation.ToString().ToLower()[0];
+                foreach(LimbBase Limb in Target.Limbs)
+                {
+                    if(RndGen.Next(0,100) < Limb.HitChance)
+                    {
+                        if(Limb.HP == 0)
+                        {
+                            Utilities.MessageLog.AddMsg(FirstName + " swings at the empty spot where " + Target.FirstName + "'s " + Limb.Description + " once was, severely injuring the air");
+                            //Miss
+                            return;
+                        }
+                        else
+                        {
+                            Limb.RecieveDamage(DamageDone);
+                            if (Limb.HP < 30)
+                            {
+                                foreach (LimbDependency Dep in LimbDependencies)
+                                {
+                                    if (Dep.TargetLimb == Limb)
+                                    {
+                                        Dep.RequiredLimb.BleedRate++;
+                                    }
+                                }
+                            }
+                            Utilities.MessageLog.AddMsg(Target.FirstName + "'s " + Limb.Description + " takes the brunt of the impact!");
+                            HasPickedALimb = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            Utilities.DeathData DD = (Utilities.DeathData)Utilities.InterStateResources.Instance.Resources["Game_DeathData"];
+            DD.Killer = this;
+            Utilities.InterStateResources.Instance.Resources["Game_DeathData"] = DD;
+        }
+
+        public void Bleed()
+        {
+            foreach (LimbBase Limb in Limbs)
+            {
+                Limb.HP -= Limb.BleedRate;
+                if (Limb.HP <= 0)
+                {
+                    Limb.BleedRate = 0;
+                    Limb.HP = 0;
+                    EnforceLimbDependencies();
+                }
             }
         }
+
 
         public bool IsAlive()
         {
-            return HP >= 0;
+            return Limbs[0].HP > 0;
         }
 
         public abstract void Generate();

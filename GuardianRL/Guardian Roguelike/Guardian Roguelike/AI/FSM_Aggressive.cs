@@ -35,9 +35,8 @@ namespace Guardian_Roguelike.AI
 
             Player = (CreatureBase)Utilities.InterStateResources.Instance.Resources["Game_PlayerCreature"];
 
-            MsgLog = (Utilities.MessageLog)Utilities.InterStateResources.Instance.Resources["Game_MessageLog"];
-            
         }
+
         public override void TakeTurn()
         {
             switch (CurState)
@@ -74,7 +73,7 @@ namespace Guardian_Roguelike.AI
                         CurFollowPath = ComputePath(LinkedCreature.Position, PlayerLastSeenAt); //How do we get there?
                         CurFollowPathIndex = 0; //Start from the beginning
                     }
-                    if (LinkedCreature.HP <= LinkedCreature.MaxHP / 3) //OH NO!
+                    if (LinkedCreature.Limbs[0].HP <= 33) //OH NO!
                     {
                         CurState = AIState.Flee;
                     }
@@ -104,20 +103,20 @@ namespace Guardian_Roguelike.AI
                     {
                         CurState = AIState.Wander;
                     }
-                    if (LinkedCreature.HP <= LinkedCreature.MaxHP / 3) //Ack! We've been wounded!
+                    if (LinkedCreature.Limbs[0].HP <= 33) //Ack! We've been wounded!
                     {
                         CurState = AIState.Flee;
                     }
                     break;
 
                 case(AIState.Attack):
-                    MsgLog.AddMsg(LinkedCreature.FirstName + " swings at you!");
+                    Utilities.MessageLog.AddMsg(LinkedCreature.FirstName + " swings at you!");
                     LinkedCreature.Attack(Player);
                     if (Utilities.GeneralMethods.Distance(LinkedCreature.Position, Player.Position) != 1)
                     {
                         CurState = AIState.Follow;
                     }
-                    if (LinkedCreature.HP <= LinkedCreature.MaxHP / 3)
+                    if (LinkedCreature.Limbs[0].HP <= 33)
                     {
                         CurState = AIState.Flee;
                     }

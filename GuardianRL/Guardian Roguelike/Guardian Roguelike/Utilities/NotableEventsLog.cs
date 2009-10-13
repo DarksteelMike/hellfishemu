@@ -4,16 +4,12 @@ using System.Text;
 
 namespace Guardian_Roguelike.Utilities
 {
-    class NotableEventsLog
+    public abstract class NotableEventsLog
     {
-        public List<NotableEvent> NotableEvents;
+        public static List<NotableEvent> NotableEvents = new List<NotableEvent>();
 
-        public NotableEventsLog()
-        {
-            NotableEvents = new List<NotableEvent>();
-        }
 
-        public void Add(int Turn, string Description)
+        public static void Add(int Turn, string Description)
         {
             NotableEvents.Add(new NotableEvent(Turn,Description));
         }

@@ -12,7 +12,6 @@ namespace Guardian_Roguelike.States
 
         private World.Creatures.Dwarf Player;
 
-        private Utilities.MessageLog MsgLog;
         private libtcodWrapper.Console MsgCons;
 
         private libtcodWrapper.Console StatusCons;
@@ -36,10 +35,6 @@ namespace Guardian_Roguelike.States
             DEBUG_PassedMilliseconds = 0;
             SkipAI = false;
             CurMode = Modes.Normal;
-            if (Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_MessageLog"))
-            {
-                Utilities.InterStateResources.Instance.Resources.Remove("Game_MessageLog");
-            }
             if (Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_FOVHandler"))
             {
                 Utilities.InterStateResources.Instance.Resources.Remove("Game_FOVHandler");
@@ -56,12 +51,14 @@ namespace Guardian_Roguelike.States
             {
                 Utilities.InterStateResources.Instance.Resources.Remove("Game_NotableEventsLog");
             }
+            if (Utilities.InterStateResources.Instance.Resources.ContainsKey("Game_DeathData"))
+            {
+                Utilities.InterStateResources.Instance.Resources.Remove("Game_DeathData");
+            }
 
-            Utilities.InterStateResources.Instance.Resources.Add("Game_MessageLog", new Utilities.MessageLog());
             Utilities.InterStateResources.Instance.Resources.Add("Game_FOVHandler", new libtcodWrapper.TCODFov(90, 30));
             Utilities.InterStateResources.Instance.Resources.Add("Game_PathFinder", new libtcodWrapper.TCODPathFinding((libtcodWrapper.TCODFov)Utilities.InterStateResources.Instance.Resources["Game_FOVHandler"], 1));
             Utilities.InterStateResources.Instance.Resources.Add("Game_CurrentLevel", new World.Map());
-            Utilities.InterStateResources.Instance.Resources.Add("Game_NotableEventsLog", new Utilities.NotableEventsLog());
             
             /*
             World.Creatures.Dwarf tPlayer = new Guardian_Roguelike.World.Creatures.Dwarf();
@@ -84,7 +81,7 @@ namespace Guardian_Roguelike.States
             MapCons = libtcodWrapper.RootConsole.GetNewConsole(90, 30);
 
             MsgCons = libtcodWrapper.RootConsole.GetNewConsole(90, 5);
-            MsgLog = (Utilities.MessageLog)Utilities.InterStateResources.Instance.Resources["Game_MessageLog"];
+            
 
             Player = (World.Creatures.Dwarf)Utilities.InterStateResources.Instance.Resources["Game_PlayerCreature"];
             Player.BaseAim += 2;
@@ -98,19 +95,15 @@ namespace Guardian_Roguelike.States
             CurrentLevel = (World.Map)Utilities.InterStateResources.Instance.Resources["Game_CurrentLevel"];
             CurrentLevel.Creatures.Add(Player);
 
-            /*
-            World.Creatures.Guardian tMonster = new Guardian_Roguelike.World.Creatures.Guardian();
-            tMonster.Name = "Chimaira";
-            tMonster.Position = CurrentLevel.GetFirstWalkable();
-            CurrentLevel.Creatures.Add(tMonster);
-            */
             Player.Position = CurrentLevel.GetFirstWalkable();
 
-            MsgLog.AddMsg("Get running, " + Player.FirstName + "!");
+            Utilities.MessageLog.AddMsg("Get running, " + Player.FirstName + "!");
 
             TurnsPassed = SkipTurns = 0;
 
             LevelNumber = 1;
+
+            Utilities.InterStateResources.Instance.Resources.Add("Game_DeathData", new Utilities.DeathData(Player, null, 0, 1));
         }
 
         public override void EnterState()
@@ -148,9 +141,9 @@ namespace Guardian_Roguelike.States
                 libtcodWrapper.RootConsole.WindowTitle = "Run, Urist, Run! Time: " + DEBUG_PassedMilliseconds.ToString() + "ms";
 
                 SkipAI = false;
-                if (Player.HP <= 0)
+                if (!Player.IsAlive())
                 {
-                    States.DeathData DD = (States.DeathData)Utilities.InterStateResources.Instance.Resources["Game_DeathData"];
+                    Utilities.DeathData DD = (Utilities.DeathData)Utilities.InterStateResources.Instance.Resources["Game_DeathData"];
                     DD.LevelsDescended = LevelNumber;
                     DD.TurnsSurvived = TurnsPassed;
                     StateManager.QueueState(StateManager.PersistentStates["GameOverState"]);
@@ -162,16 +155,19 @@ namespace Guardian_Roguelike.States
         private void Render()
         {
             Root.Clear();
-            MsgLog.RenderRecentToConsole(MsgCons);
+            Utilities.MessageLog.RenderRecentToConsole(MsgCons);
             MsgCons.Blit(0, 0, 90, 5, Root, 0, 0);
 
             CurrentLevel.RenderToConsole(MapCons);
 
             MapCons.Blit(0, 0, 90, 30, Root, 1, 5);
 
-            StatusCons.PrintLine("HP: " + Player.HP.ToString() + "/" + Player.MaxHP.ToString() + "  Turn: " + TurnsPassed.ToString(),0,0,libtcodWrapper.LineAlignment.Left);
+            StatusCons.Clear();
+            StatusCons.PrintLine("Turn: " + TurnsPassed.ToString(),0,0,libtcodWrapper.LineAlignment.Left);
             StatusCons.PrintLine("Level " + LevelNumber.ToString(), 0, 1, libtcodWrapper.LineAlignment.Left);
             StatusCons.PrintLine("V:" + Player.BaseVigor.ToString() + " E:" + Player.BaseEnergy.ToString() + " Sp:" + Player.BaseSpeed.ToString() + " St:" + Player.BaseStrength.ToString() + " A:" + Player.BaseAim.ToString(), 0, 2, libtcodWrapper.LineAlignment.Left);
+            
+            StatusCons.PrintLine(MakeLimbStatusString(Player), 0, 3, libtcodWrapper.LineAlignment.Left);
             StatusCons.Blit(0, 0, 90, 5, Root, 0, 35);
 
             Root.Flush();
@@ -181,6 +177,7 @@ namespace Guardian_Roguelike.States
         {
             foreach (World.Creatures.CreatureBase c in CurrentLevel.Creatures)
             {
+                c.Bleed();
                 if (!c.Equals(Player) && c.IsAlive())
                 {
                     c.AI();
@@ -319,16 +316,16 @@ namespace Guardian_Roguelike.States
                     switch (DR)
                     {
                         case (World.DestroyResults.AlreadyEmpty):
-                            MsgLog.AddMsg("You swing at the air,predictably hitting nothing, and stumble forward.");
+                            Utilities.MessageLog.AddMsg("You swing at the air,predictably hitting nothing, and stumble forward.");
                             break;
                         case (World.DestroyResults.Cancelled):
-                            MsgLog.AddMsg("You lower your pick again.");
+                            Utilities.MessageLog.AddMsg("You lower your pick again.");
                             break;
                         case (World.DestroyResults.Indestructible):
-                            MsgLog.AddMsg("You swing with all your strength, but the pick bounces off the wall without doing damage.", libtcodWrapper.Color.FromRGB(255, 0, 0));
+                            Utilities.MessageLog.AddMsg("You swing with all your strength, but the pick bounces off the wall without doing damage.", libtcodWrapper.Color.FromRGB(255, 0, 0));
                             break;
                         case (World.DestroyResults.Success):
-                            MsgLog.AddMsg("The rock crumbles under the might of your pick.");
+                            Utilities.MessageLog.AddMsg("The rock crumbles under the might of your pick.");
                             break;
                     }
                     CurMode = Modes.Normal;
@@ -376,7 +373,8 @@ namespace Guardian_Roguelike.States
                     return true;
                     break;
                 case('d')://Debug key
-                    MsgLog.AddMsg(CurrentLevel.Creatures[1].FirstName + " is in " + ((global::Guardian_Roguelike.AI.FSM_Aggressive)CurrentLevel.Creatures[1].MyAI).CurState.ToString() + " mode " + CurrentLevel.Creatures[1].Position.ToString());
+                    Utilities.MessageLog.AddMsg(CurrentLevel.Creatures[1].FirstName + " is in " + ((global::Guardian_Roguelike.AI.FSM_Aggressive)CurrentLevel.Creatures[1].MyAI).CurState.ToString() + " mode " + CurrentLevel.Creatures[1].Position.ToString());
+                    System.Windows.Forms.MessageBox.Show(MakeLimbStatusString(CurrentLevel.Creatures[1]));
                     break;
 
                 case('t'): //All-round testing button
@@ -384,25 +382,25 @@ namespace Guardian_Roguelike.States
                     if (CurrentLevel.CheckType(Player.Position) == Guardian_Roguelike.World.TerrainTypes.ExitPortal)
                     {
                         MakeNewMap();
-                        MsgLog.AddMsg("You descend deeper into the pit...");
+                        Utilities.MessageLog.AddMsg("You descend deeper into the pit...");
                     }
                     else
                     {
-                        MsgLog.AddMsg("There are no stairs here!");
+                        Utilities.MessageLog.AddMsg("There are no stairs here!");
                     }
                     break;
 
                 case('s'):
                     //Swing
                     //TODO: Check what is wielded.Assumes pick for now
-                    MsgLog.AddMsg("Swing in which direction?");
+                    Utilities.MessageLog.AddMsg("Swing in which direction?");
                     CurMode = Modes.Swinging;
                     SkipAI = true;
                     break;
                 case('l'):
                     //Look
                     CurrentLevel.CalculateVisible(Player.Position, Player.BaseAim);
-                    CurrentLevel.PostLookMessages(MsgLog);
+                    CurrentLevel.PostLookMessages();
                     break;
             }
 
@@ -428,7 +426,7 @@ namespace Guardian_Roguelike.States
 
                 if (CurrentLevel.CheckWalkable(dx, dy))
                 {
-                    World.Creatures.Dwarf Olon = new World.Creatures.Dwarf();
+                    World.Creatures.GiantRat Olon = new World.Creatures.GiantRat();
                     Olon.Generate();
                     Olon.Position = new System.Drawing.Point(dx, dy);
                     Olon.MyAI = new AI.FSM_Aggressive(Olon);
@@ -436,6 +434,16 @@ namespace Guardian_Roguelike.States
                     break;
                 }
             }
+        }
+
+        private string MakeLimbStatusString(World.Creatures.CreatureBase C)
+        {
+            string LimbsString = "";
+            foreach (World.Creatures.Limbs.LimbBase Limb in C.Limbs)
+            {
+                LimbsString += Utilities.GeneralMethods.RemoveLowerCaseAndNonAlpha(Limb.Description) + ": " + Limb.HP + " ";
+            }
+            return LimbsString;
         }
 
         public override void ExitState()
