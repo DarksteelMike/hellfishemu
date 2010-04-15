@@ -4,12 +4,13 @@ using System.Text;
 
 namespace SharpBoySDL
 {
-    class MemoryHandler
+    public class MemoryHandler
     {
         #region Member Fields
         private byte[] RAMSpace;
         private byte[] ROMSpace;
         private byte[] RAMBanks;
+        private byte[] BIOS;
         private byte CurRAMBank;
         private byte CurROMBank;
         private enum Mapper { Unknown = -1, None, MBC1, MBC2 };
@@ -28,7 +29,15 @@ namespace SharpBoySDL
 
         public MemoryHandler()
         {
-            RAMSpace = new byte[0x10000];
+            using (System.IO.FileStream fs = new System.IO.FileStream("DMG_ROM.bin", System.IO.FileMode.Open))
+            {
+                BIOS = new byte[fs.Length];
+                fs.Read(BIOS, 0, (int)fs.Length);
+                fs.Close();
+            }
+            
+            RAMSpace = new byte[0x10000 + BIOS.Length];
+            Array.Copy(BIOS, 0, RAMSpace, 0x10000, BIOS.Length);
             RAMBanks = new byte[0x8000];
             CurRAMBank = 0;
             CurROMBank = 1;
@@ -68,7 +77,23 @@ namespace SharpBoySDL
 
         public ushort ReadWord(int Address)
         {
+            if ((Address + 1) > 0xFFFF)
+            {
+                throw new InvalidOperationException("Tried to read beyond the end of memory!");
+            }
+
             return (ushort)((ReadByte(Address+1) << 8) | ReadByte(Address));
+        }
+
+        public void WriteWord(int Address, ushort Data)
+        {
+            if ((Address + 1) > 0xFFFF)
+            {
+                throw new InvalidOperationException("Tried to read beyond the end of memory!");
+            }
+
+            RAMSpace[Address] = (byte)(Data & 0x00FF);
+            RAMSpace[Address + 1] = (byte)((Data & 0xFF00) >> 8);
         }
 
         public void WriteByte(int Address, byte Data)
@@ -168,7 +193,14 @@ namespace SharpBoySDL
         {
             ROMSpace = new byte[ROM.Length];
             Array.Copy(ROM, ROMSpace, ROM.Length);
-            Array.Copy(ROM, RAMSpace, 0x4000);//Fixed Bank 0
+            if (ROM.Length < 0x4000)
+            {
+                Array.Copy(ROM, RAMSpace, ROM.Length);
+            }
+            else
+            {
+                Array.Copy(ROM, RAMSpace, 0x4000);//Fixed Bank 0
+            }
 
             switch (RAMSpace[0x147])
             {
