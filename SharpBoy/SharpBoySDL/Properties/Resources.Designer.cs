@@ -59,12 +59,5 @@ namespace SharpBoySDL.Properties {
                 resourceCulture = value;
             }
         }
-        
-        internal static byte[] DMG_ROM {
-            get {
-                object obj = ResourceManager.GetObject("DMG_ROM", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }
