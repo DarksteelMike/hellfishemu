@@ -18,6 +18,41 @@ namespace SharpBoy2.Emulation
             GameBoyRAM = new byte[0x10000];
         }
 
+        public void Reset()
+        {
+            GameBoyRAM[0xFF05] = 0;
+            GameBoyRAM[0xFF06] = 0;
+            GameBoyRAM[0xFF07] = 0;
+            GameBoyRAM[0xFF10] = 0x80;
+            GameBoyRAM[0xFF11] = 0xBF;
+            GameBoyRAM[0xFF12] = 0xF3;
+            GameBoyRAM[0xFF14] = 0xBF;
+            GameBoyRAM[0xFF16] = 0x3F;
+            GameBoyRAM[0xFF17] = 0;
+            GameBoyRAM[0xFF19] = 0xBF;
+            GameBoyRAM[0xFF1A] = 0x7F;
+            GameBoyRAM[0xFF1B] = 0xFF;
+            GameBoyRAM[0xFF1C] = 0x9F;
+            GameBoyRAM[0xFF1E] = 0xBF;
+            GameBoyRAM[0xFF20] = 0xFF;
+            GameBoyRAM[0xFF21] = 0;
+            GameBoyRAM[0xFF22] = 0;
+            GameBoyRAM[0xFF23] = 0xBF;
+            GameBoyRAM[0xFF24] = 0x77;
+            GameBoyRAM[0xFF25] = 0xF3;
+            GameBoyRAM[0xFF26] = 0xF1;
+            GameBoyRAM[0xFF40] = 0x91;
+            GameBoyRAM[0xFF42] = 0;
+            GameBoyRAM[0xFF43] = 0;
+            GameBoyRAM[0xFF45] = 0;
+            GameBoyRAM[0xFF47] = 0xFC;
+            GameBoyRAM[0xFF48] = 0xFF;
+            GameBoyRAM[0xFF49] = 0xFF;
+            GameBoyRAM[0xFF4A] = 0;
+            GameBoyRAM[0xFF4B] = 0;
+            GameBoyRAM[0xFFFF] = 0;
+        }
+
         public void LoadROM(byte[] R)
         {
             ROM = new byte[R.Length];

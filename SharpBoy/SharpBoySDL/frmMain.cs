@@ -41,10 +41,17 @@ namespace SharpBoy2
                 }
                 MyCore = new SharpBoy2.Emulation.Core();
                 MyCore.LoadROM(tmpbuf);
+                MyCore.Reset();
                 debugToolStripMenuItem.Enabled = true;
                 resetAndDebugToolStripMenuItem.Enabled = true;
                 Debugger = new frmDebugger(MyCore);
+                Debugger.Disposed += new EventHandler(Debugger_Disposed);
             }
+        }
+
+        void Debugger_Disposed(object sender, EventArgs e)
+        {
+            Debugger = new frmDebugger(MyCore);
         }
 
         private void debuggerToolStripMenuItem_Click(object sender, EventArgs e)
@@ -54,7 +61,8 @@ namespace SharpBoy2
 
         private void resetAndDebugToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
+            MyCore.Reset();
+            Debugger.Show();
         }
     }
 }

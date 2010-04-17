@@ -32,28 +32,28 @@ namespace SharpBoy2
             this.lblUIMemory = new System.Windows.Forms.Label();
             this.bJumpToPC = new System.Windows.Forms.Button();
             this.grpRegisters = new System.Windows.Forms.GroupBox();
-            this.lblUIA = new System.Windows.Forms.Label();
-            this.tbA = new System.Windows.Forms.TextBox();
-            this.tbB = new System.Windows.Forms.TextBox();
-            this.lblUIB = new System.Windows.Forms.Label();
-            this.tbD = new System.Windows.Forms.TextBox();
-            this.lblUID = new System.Windows.Forms.Label();
-            this.tbHL = new System.Windows.Forms.TextBox();
-            this.lblUIHL = new System.Windows.Forms.Label();
-            this.tbF = new System.Windows.Forms.TextBox();
-            this.lblUIF = new System.Windows.Forms.Label();
-            this.tbC = new System.Windows.Forms.TextBox();
-            this.lblUIC = new System.Windows.Forms.Label();
-            this.tbE = new System.Windows.Forms.TextBox();
-            this.lblUIE = new System.Windows.Forms.Label();
-            this.cbZ = new System.Windows.Forms.CheckBox();
-            this.cbN = new System.Windows.Forms.CheckBox();
-            this.cbH = new System.Windows.Forms.CheckBox();
-            this.cbC = new System.Windows.Forms.CheckBox();
-            this.tbPC = new System.Windows.Forms.TextBox();
-            this.lblUIPC = new System.Windows.Forms.Label();
             this.tbSP = new System.Windows.Forms.TextBox();
             this.lblUISP = new System.Windows.Forms.Label();
+            this.tbPC = new System.Windows.Forms.TextBox();
+            this.lblUIPC = new System.Windows.Forms.Label();
+            this.cbC = new System.Windows.Forms.CheckBox();
+            this.cbH = new System.Windows.Forms.CheckBox();
+            this.cbN = new System.Windows.Forms.CheckBox();
+            this.cbZ = new System.Windows.Forms.CheckBox();
+            this.tbE = new System.Windows.Forms.TextBox();
+            this.lblUIE = new System.Windows.Forms.Label();
+            this.tbC = new System.Windows.Forms.TextBox();
+            this.lblUIC = new System.Windows.Forms.Label();
+            this.tbF = new System.Windows.Forms.TextBox();
+            this.lblUIF = new System.Windows.Forms.Label();
+            this.tbHL = new System.Windows.Forms.TextBox();
+            this.lblUIHL = new System.Windows.Forms.Label();
+            this.tbD = new System.Windows.Forms.TextBox();
+            this.lblUID = new System.Windows.Forms.Label();
+            this.tbB = new System.Windows.Forms.TextBox();
+            this.lblUIB = new System.Windows.Forms.Label();
+            this.tbA = new System.Windows.Forms.TextBox();
+            this.lblUIA = new System.Windows.Forms.Label();
             this.bEditRAM = new System.Windows.Forms.Button();
             this.lblUITIMAUpdate = new System.Windows.Forms.Label();
             this.lblUIDivUpdate = new System.Windows.Forms.Label();
@@ -62,6 +62,7 @@ namespace SharpBoy2
             this.lblCyclesRun = new System.Windows.Forms.Label();
             this.lblUICyclesRun = new System.Windows.Forms.Label();
             this.bStep = new System.Windows.Forms.Button();
+            this.bReset = new System.Windows.Forms.Button();
             this.vlbRAM = new VirtualListBox.VListBox();
             this.vlbROM = new VirtualListBox.VListBox();
             this.grpRegisters.SuspendLayout();
@@ -87,7 +88,7 @@ namespace SharpBoy2
             // 
             // bJumpToPC
             // 
-            this.bJumpToPC.Location = new System.Drawing.Point(191, 26);
+            this.bJumpToPC.Location = new System.Drawing.Point(191, 81);
             this.bJumpToPC.Name = "bJumpToPC";
             this.bJumpToPC.Size = new System.Drawing.Size(75, 23);
             this.bJumpToPC.TabIndex = 4;
@@ -125,157 +126,21 @@ namespace SharpBoy2
             this.grpRegisters.TabStop = false;
             this.grpRegisters.Text = "CPU Registers";
             // 
-            // lblUIA
+            // tbSP
             // 
-            this.lblUIA.AutoSize = true;
-            this.lblUIA.Location = new System.Drawing.Point(6, 16);
-            this.lblUIA.Name = "lblUIA";
-            this.lblUIA.Size = new System.Drawing.Size(14, 13);
-            this.lblUIA.TabIndex = 0;
-            this.lblUIA.Text = "A";
+            this.tbSP.Location = new System.Drawing.Point(117, 117);
+            this.tbSP.Name = "tbSP";
+            this.tbSP.Size = new System.Drawing.Size(62, 20);
+            this.tbSP.TabIndex = 21;
             // 
-            // tbA
+            // lblUISP
             // 
-            this.tbA.Location = new System.Drawing.Point(26, 13);
-            this.tbA.Name = "tbA";
-            this.tbA.Size = new System.Drawing.Size(45, 20);
-            this.tbA.TabIndex = 1;
-            // 
-            // tbB
-            // 
-            this.tbB.Location = new System.Drawing.Point(26, 39);
-            this.tbB.Name = "tbB";
-            this.tbB.Size = new System.Drawing.Size(45, 20);
-            this.tbB.TabIndex = 3;
-            // 
-            // lblUIB
-            // 
-            this.lblUIB.AutoSize = true;
-            this.lblUIB.Location = new System.Drawing.Point(6, 42);
-            this.lblUIB.Name = "lblUIB";
-            this.lblUIB.Size = new System.Drawing.Size(14, 13);
-            this.lblUIB.TabIndex = 2;
-            this.lblUIB.Text = "B";
-            // 
-            // tbD
-            // 
-            this.tbD.Location = new System.Drawing.Point(26, 65);
-            this.tbD.Name = "tbD";
-            this.tbD.Size = new System.Drawing.Size(45, 20);
-            this.tbD.TabIndex = 5;
-            // 
-            // lblUID
-            // 
-            this.lblUID.AutoSize = true;
-            this.lblUID.Location = new System.Drawing.Point(6, 68);
-            this.lblUID.Name = "lblUID";
-            this.lblUID.Size = new System.Drawing.Size(15, 13);
-            this.lblUID.TabIndex = 4;
-            this.lblUID.Text = "D";
-            // 
-            // tbHL
-            // 
-            this.tbHL.Location = new System.Drawing.Point(26, 91);
-            this.tbHL.Name = "tbHL";
-            this.tbHL.Size = new System.Drawing.Size(62, 20);
-            this.tbHL.TabIndex = 7;
-            // 
-            // lblUIHL
-            // 
-            this.lblUIHL.AutoSize = true;
-            this.lblUIHL.Location = new System.Drawing.Point(6, 94);
-            this.lblUIHL.Name = "lblUIHL";
-            this.lblUIHL.Size = new System.Drawing.Size(21, 13);
-            this.lblUIHL.TabIndex = 6;
-            this.lblUIHL.Text = "HL";
-            // 
-            // tbF
-            // 
-            this.tbF.Location = new System.Drawing.Point(95, 13);
-            this.tbF.Name = "tbF";
-            this.tbF.Size = new System.Drawing.Size(45, 20);
-            this.tbF.TabIndex = 9;
-            // 
-            // lblUIF
-            // 
-            this.lblUIF.AutoSize = true;
-            this.lblUIF.Location = new System.Drawing.Point(75, 16);
-            this.lblUIF.Name = "lblUIF";
-            this.lblUIF.Size = new System.Drawing.Size(13, 13);
-            this.lblUIF.TabIndex = 8;
-            this.lblUIF.Text = "F";
-            // 
-            // tbC
-            // 
-            this.tbC.Location = new System.Drawing.Point(95, 39);
-            this.tbC.Name = "tbC";
-            this.tbC.Size = new System.Drawing.Size(45, 20);
-            this.tbC.TabIndex = 11;
-            // 
-            // lblUIC
-            // 
-            this.lblUIC.AutoSize = true;
-            this.lblUIC.Location = new System.Drawing.Point(75, 42);
-            this.lblUIC.Name = "lblUIC";
-            this.lblUIC.Size = new System.Drawing.Size(14, 13);
-            this.lblUIC.TabIndex = 10;
-            this.lblUIC.Text = "C";
-            // 
-            // tbE
-            // 
-            this.tbE.Location = new System.Drawing.Point(95, 65);
-            this.tbE.Name = "tbE";
-            this.tbE.Size = new System.Drawing.Size(45, 20);
-            this.tbE.TabIndex = 13;
-            // 
-            // lblUIE
-            // 
-            this.lblUIE.AutoSize = true;
-            this.lblUIE.Location = new System.Drawing.Point(75, 68);
-            this.lblUIE.Name = "lblUIE";
-            this.lblUIE.Size = new System.Drawing.Size(14, 13);
-            this.lblUIE.TabIndex = 12;
-            this.lblUIE.Text = "E";
-            // 
-            // cbZ
-            // 
-            this.cbZ.AutoSize = true;
-            this.cbZ.Location = new System.Drawing.Point(146, 15);
-            this.cbZ.Name = "cbZ";
-            this.cbZ.Size = new System.Drawing.Size(33, 17);
-            this.cbZ.TabIndex = 14;
-            this.cbZ.Text = "Z";
-            this.cbZ.UseVisualStyleBackColor = true;
-            // 
-            // cbN
-            // 
-            this.cbN.AutoSize = true;
-            this.cbN.Location = new System.Drawing.Point(146, 38);
-            this.cbN.Name = "cbN";
-            this.cbN.Size = new System.Drawing.Size(34, 17);
-            this.cbN.TabIndex = 15;
-            this.cbN.Text = "N";
-            this.cbN.UseVisualStyleBackColor = true;
-            // 
-            // cbH
-            // 
-            this.cbH.AutoSize = true;
-            this.cbH.Location = new System.Drawing.Point(146, 61);
-            this.cbH.Name = "cbH";
-            this.cbH.Size = new System.Drawing.Size(34, 17);
-            this.cbH.TabIndex = 16;
-            this.cbH.Text = "H";
-            this.cbH.UseVisualStyleBackColor = true;
-            // 
-            // cbC
-            // 
-            this.cbC.AutoSize = true;
-            this.cbC.Location = new System.Drawing.Point(146, 84);
-            this.cbC.Name = "cbC";
-            this.cbC.Size = new System.Drawing.Size(33, 17);
-            this.cbC.TabIndex = 17;
-            this.cbC.Text = "C";
-            this.cbC.UseVisualStyleBackColor = true;
+            this.lblUISP.AutoSize = true;
+            this.lblUISP.Location = new System.Drawing.Point(97, 120);
+            this.lblUISP.Name = "lblUISP";
+            this.lblUISP.Size = new System.Drawing.Size(21, 13);
+            this.lblUISP.TabIndex = 20;
+            this.lblUISP.Text = "SP";
             // 
             // tbPC
             // 
@@ -293,21 +158,157 @@ namespace SharpBoy2
             this.lblUIPC.TabIndex = 18;
             this.lblUIPC.Text = "PC";
             // 
-            // tbSP
+            // cbC
             // 
-            this.tbSP.Location = new System.Drawing.Point(117, 117);
-            this.tbSP.Name = "tbSP";
-            this.tbSP.Size = new System.Drawing.Size(62, 20);
-            this.tbSP.TabIndex = 21;
+            this.cbC.AutoSize = true;
+            this.cbC.Location = new System.Drawing.Point(146, 84);
+            this.cbC.Name = "cbC";
+            this.cbC.Size = new System.Drawing.Size(33, 17);
+            this.cbC.TabIndex = 17;
+            this.cbC.Text = "C";
+            this.cbC.UseVisualStyleBackColor = true;
             // 
-            // lblUISP
+            // cbH
             // 
-            this.lblUISP.AutoSize = true;
-            this.lblUISP.Location = new System.Drawing.Point(97, 120);
-            this.lblUISP.Name = "lblUISP";
-            this.lblUISP.Size = new System.Drawing.Size(21, 13);
-            this.lblUISP.TabIndex = 20;
-            this.lblUISP.Text = "SP";
+            this.cbH.AutoSize = true;
+            this.cbH.Location = new System.Drawing.Point(146, 61);
+            this.cbH.Name = "cbH";
+            this.cbH.Size = new System.Drawing.Size(34, 17);
+            this.cbH.TabIndex = 16;
+            this.cbH.Text = "H";
+            this.cbH.UseVisualStyleBackColor = true;
+            // 
+            // cbN
+            // 
+            this.cbN.AutoSize = true;
+            this.cbN.Location = new System.Drawing.Point(146, 38);
+            this.cbN.Name = "cbN";
+            this.cbN.Size = new System.Drawing.Size(34, 17);
+            this.cbN.TabIndex = 15;
+            this.cbN.Text = "N";
+            this.cbN.UseVisualStyleBackColor = true;
+            // 
+            // cbZ
+            // 
+            this.cbZ.AutoSize = true;
+            this.cbZ.Location = new System.Drawing.Point(146, 15);
+            this.cbZ.Name = "cbZ";
+            this.cbZ.Size = new System.Drawing.Size(33, 17);
+            this.cbZ.TabIndex = 14;
+            this.cbZ.Text = "Z";
+            this.cbZ.UseVisualStyleBackColor = true;
+            // 
+            // tbE
+            // 
+            this.tbE.Location = new System.Drawing.Point(95, 65);
+            this.tbE.Name = "tbE";
+            this.tbE.Size = new System.Drawing.Size(45, 20);
+            this.tbE.TabIndex = 13;
+            // 
+            // lblUIE
+            // 
+            this.lblUIE.AutoSize = true;
+            this.lblUIE.Location = new System.Drawing.Point(75, 68);
+            this.lblUIE.Name = "lblUIE";
+            this.lblUIE.Size = new System.Drawing.Size(14, 13);
+            this.lblUIE.TabIndex = 12;
+            this.lblUIE.Text = "E";
+            // 
+            // tbC
+            // 
+            this.tbC.Location = new System.Drawing.Point(95, 39);
+            this.tbC.Name = "tbC";
+            this.tbC.Size = new System.Drawing.Size(45, 20);
+            this.tbC.TabIndex = 11;
+            // 
+            // lblUIC
+            // 
+            this.lblUIC.AutoSize = true;
+            this.lblUIC.Location = new System.Drawing.Point(75, 42);
+            this.lblUIC.Name = "lblUIC";
+            this.lblUIC.Size = new System.Drawing.Size(14, 13);
+            this.lblUIC.TabIndex = 10;
+            this.lblUIC.Text = "C";
+            // 
+            // tbF
+            // 
+            this.tbF.Location = new System.Drawing.Point(95, 13);
+            this.tbF.Name = "tbF";
+            this.tbF.Size = new System.Drawing.Size(45, 20);
+            this.tbF.TabIndex = 9;
+            // 
+            // lblUIF
+            // 
+            this.lblUIF.AutoSize = true;
+            this.lblUIF.Location = new System.Drawing.Point(75, 16);
+            this.lblUIF.Name = "lblUIF";
+            this.lblUIF.Size = new System.Drawing.Size(13, 13);
+            this.lblUIF.TabIndex = 8;
+            this.lblUIF.Text = "F";
+            // 
+            // tbHL
+            // 
+            this.tbHL.Location = new System.Drawing.Point(26, 91);
+            this.tbHL.Name = "tbHL";
+            this.tbHL.Size = new System.Drawing.Size(62, 20);
+            this.tbHL.TabIndex = 7;
+            // 
+            // lblUIHL
+            // 
+            this.lblUIHL.AutoSize = true;
+            this.lblUIHL.Location = new System.Drawing.Point(6, 94);
+            this.lblUIHL.Name = "lblUIHL";
+            this.lblUIHL.Size = new System.Drawing.Size(21, 13);
+            this.lblUIHL.TabIndex = 6;
+            this.lblUIHL.Text = "HL";
+            // 
+            // tbD
+            // 
+            this.tbD.Location = new System.Drawing.Point(26, 65);
+            this.tbD.Name = "tbD";
+            this.tbD.Size = new System.Drawing.Size(45, 20);
+            this.tbD.TabIndex = 5;
+            // 
+            // lblUID
+            // 
+            this.lblUID.AutoSize = true;
+            this.lblUID.Location = new System.Drawing.Point(6, 68);
+            this.lblUID.Name = "lblUID";
+            this.lblUID.Size = new System.Drawing.Size(15, 13);
+            this.lblUID.TabIndex = 4;
+            this.lblUID.Text = "D";
+            // 
+            // tbB
+            // 
+            this.tbB.Location = new System.Drawing.Point(26, 39);
+            this.tbB.Name = "tbB";
+            this.tbB.Size = new System.Drawing.Size(45, 20);
+            this.tbB.TabIndex = 3;
+            // 
+            // lblUIB
+            // 
+            this.lblUIB.AutoSize = true;
+            this.lblUIB.Location = new System.Drawing.Point(6, 42);
+            this.lblUIB.Name = "lblUIB";
+            this.lblUIB.Size = new System.Drawing.Size(14, 13);
+            this.lblUIB.TabIndex = 2;
+            this.lblUIB.Text = "B";
+            // 
+            // tbA
+            // 
+            this.tbA.Location = new System.Drawing.Point(26, 13);
+            this.tbA.Name = "tbA";
+            this.tbA.Size = new System.Drawing.Size(45, 20);
+            this.tbA.TabIndex = 1;
+            // 
+            // lblUIA
+            // 
+            this.lblUIA.AutoSize = true;
+            this.lblUIA.Location = new System.Drawing.Point(6, 16);
+            this.lblUIA.Name = "lblUIA";
+            this.lblUIA.Size = new System.Drawing.Size(14, 13);
+            this.lblUIA.TabIndex = 0;
+            this.lblUIA.Text = "A";
             // 
             // bEditRAM
             // 
@@ -382,10 +383,21 @@ namespace SharpBoy2
             this.bStep.UseVisualStyleBackColor = true;
             this.bStep.Click += new System.EventHandler(this.bStep_Click);
             // 
+            // bReset
+            // 
+            this.bReset.Location = new System.Drawing.Point(191, 26);
+            this.bReset.Name = "bReset";
+            this.bReset.Size = new System.Drawing.Size(75, 23);
+            this.bReset.TabIndex = 14;
+            this.bReset.Text = "Reset";
+            this.bReset.UseVisualStyleBackColor = true;
+            this.bReset.Click += new System.EventHandler(this.bReset_Click);
+            // 
             // vlbRAM
             // 
             this.vlbRAM.Count = 1;
             this.vlbRAM.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.vlbRAM.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.vlbRAM.FormattingEnabled = true;
             this.vlbRAM.ItemHeight = 16;
             this.vlbRAM.Location = new System.Drawing.Point(599, 26);
@@ -398,6 +410,7 @@ namespace SharpBoy2
             // 
             this.vlbROM.Count = 1;
             this.vlbROM.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.vlbROM.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.vlbROM.FormattingEnabled = true;
             this.vlbROM.ItemHeight = 16;
             this.vlbROM.Location = new System.Drawing.Point(12, 26);
@@ -411,6 +424,7 @@ namespace SharpBoy2
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 486);
+            this.Controls.Add(this.bReset);
             this.Controls.Add(this.bStep);
             this.Controls.Add(this.lblCyclesRun);
             this.Controls.Add(this.lblUICyclesRun);
@@ -426,7 +440,7 @@ namespace SharpBoy2
             this.Controls.Add(this.lblUIROM);
             this.Controls.Add(this.vlbROM);
             this.Name = "frmDebugger";
-            this.Text = "frmDebugger";
+            this.Text = "Debugger";
             this.grpRegisters.ResumeLayout(false);
             this.grpRegisters.PerformLayout();
             this.ResumeLayout(false);
@@ -472,5 +486,6 @@ namespace SharpBoy2
         private System.Windows.Forms.Label lblCyclesRun;
         private System.Windows.Forms.Label lblUICyclesRun;
         private System.Windows.Forms.Button bStep;
+        private System.Windows.Forms.Button bReset;
     }
 }

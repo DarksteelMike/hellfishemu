@@ -43,7 +43,6 @@ namespace SharpBoy2.Emulation
             ProgramCounter = new Register();
             MyCore = C;
 
-            MessageBox.Show(Application.ExecutablePath);
             using (System.IO.FileStream fs = new System.IO.FileStream(Application.ExecutablePath.Substring(0,Application.ExecutablePath.LastIndexOf("\\")+1) + "DMG_ROM.bin", System.IO.FileMode.Open))
             {
                 BIOS = new byte[fs.Length];
@@ -58,14 +57,15 @@ namespace SharpBoy2.Emulation
 
         public void Reset()
         {
-            AF.Word = 0;
-            BC.Word = 0;
-            DE.Word = 0;
-            HL.Word = 0;
-            StackPointer.Word = 0;
+            AF.High = 0x01;
+            AF.Low = 0xB0;
+            BC.Word = 0x0013;
+            DE.Word = 0x00D8;
+            HL.Word = 0x014D;
+            StackPointer.Word = 0xFFFE;
             ProgramCounter.Word = 0;
 
-            Array.Copy(BIOS, MyCore.MyMemory.GameBoyRAM, 0);
+            Array.Copy(BIOS, 0, MyCore.MyMemory.GameBoyRAM, 0, BIOS.Length);
 
             DIV_Counter = 256;
             TIMA_Counter = 1024;
@@ -96,6 +96,7 @@ namespace SharpBoy2.Emulation
         public int DoOpcode()
         {
             byte Opcode = MyCore.MyMemory.Read(ProgramCounter.Word);
+            sbyte Jumpval;
             int CyclesUsed = 0;
             switch(Opcode)
             {
@@ -226,8 +227,195 @@ namespace SharpBoy2.Emulation
                     break;
                 case(0x17): //RL A
                     RL_R8(ref AF.High);
+                    CyclesUsed = 2;
                     break;
+                case(0x18): //JR n
+                    Jumpval = (sbyte)MyCore.MyMemory.Read(++ProgramCounter.Word);
+                    if (Jumpval < 0)
+                    {
+                        ProgramCounter.Word -= (ushort)Math.Abs(Jumpval);
+                    }
+                    else
+                    {
+                        ProgramCounter.Word += (ushort)Math.Abs(Jumpval);
+                    }
+                    CyclesUsed = 3;
+                    break;
+                case(0x19): //ADD HL,DE
+                    ADD_R16_R16(ref HL, DE);
+                    CyclesUsed = 2;
+                    break;
+                case(0x1A): //LD A,(DE)
+                    AF.High = MyCore.MyMemory.Read(DE.Word);
+                    CyclesUsed = 2;
+                    break;
+                case(0x1B): //DEC DE
+                    if (DE.Word == 0xFFFF)
+                    {
+                        DE.Word = 0;
+                    }
+                    else
+                    {
+                        DE.Word++;
+                    }
+                    CyclesUsed = 2;
+                    break;
+                case(0x1C): //INC E
+                    INC_R8(ref DE.Low);
+                    CyclesUsed = 1;
+                    break;
+                case(0x1D): //DEC E
+                    DEC_R8(ref DE.Low);
+                    CyclesUsed = 1;
+                    break;
+                case(0x1E): //LD E,n
+                    Utility.SetBit(ref AF.Low, FLAG_Z, SBMode.Off);
+                    Utility.SetBit(ref AF.Low, FLAG_N, SBMode.Off);
+                    DE.Low = MyCore.MyMemory.Read(++ProgramCounter.Word);
+                    CyclesUsed = 2;
+                    break;
+                case(0x1F): //RR A
+                    RR_R8(ref AF.High);
+                    CyclesUsed = 2;
+                    break;
+                case(0x20): //JR NZ,n
+                    Jumpval = (sbyte)MyCore.MyMemory.Read(++ProgramCounter.Word);
+                    if (!Utility.IsBitSet(AF.Low, FLAG_Z))
+                    {
+                        if (Jumpval < 0)
+                        {
+                            ProgramCounter.Word -= (ushort)Math.Abs(Jumpval);
+                        }
+                        else
+                        {
+                            ProgramCounter.Word += (ushort)Math.Abs(Jumpval);
+                        }
+                    }
+                    CyclesUsed = 3;
+                    break;
+                case(0x21): //LD HL,nn
+                    LD_R16_NN(ref HL, MyCore.MyMemory.ReadWord(++ProgramCounter.Word));
+                    ProgramCounter.Word++;
+                    CyclesUsed = 3;
+                    break;
+                case(0x22): //LDI (HL),A
+                    MyCore.MyMemory.Write(HL.Word, AF.High);
+                    INC_R16(ref HL);
+                    CyclesUsed = 2;
+                    break;
+                case(0x23): //INC HL
+                    INC_R16(ref HL);
+                    CyclesUsed = 2;
+                    break;
+                case(0x24): //INC H
+                    INC_R8(ref HL.High);
+                    CyclesUsed = 1;
+                    break;
+                case(0x25): //DEC H
+                    DEC_R8(ref HL.Low);
+                    CyclesUsed = 1;
+                    break;
+                case(0x26): //LD H,n
+                    HL.High = MyCore.MyMemory.Read(++ProgramCounter.Word);
+                    CyclesUsed = 2;
+                    break;
+                case(0x27): //DAA
 
+                    if (Utility.IsBitSet(AF.Low, FLAG_N))
+                    {
+                        if ((AF.High & 0x0F) > 0x09 || (AF.Low & 0x20) != 0)
+                        {
+                            AF.High -= 0x06;
+                            if ((AF.High & 0xF0) == 0xF0)
+                            {
+                                Utility.SetBit(ref AF.Low, FLAG_C, SBMode.On);
+                            }
+                            else
+                            {
+                                Utility.SetBit(ref AF.Low, FLAG_C, SBMode.Off);
+                            }
+                        }
+                        if ((AF.High & 0xF0) > 0x90 || (AF.High & 0x10) != 0)
+                        {
+                            AF.High -= 0x60;
+                        }
+                    }
+                    else
+                    {
+                        if ((AF.High & 0x0F) > 9 || (AF.High & 0x20) != 0)
+                        {
+                            AF.High += 0x06;
+                            if ((AF.High & 0xF0) == 0)
+                            {
+                                Utility.SetBit(ref AF.Low, FLAG_C, SBMode.On);
+                            }
+                            else
+                            {
+                                Utility.SetBit(ref AF.Low, FLAG_C, SBMode.Off);
+                            }
+                        }
+                        if ((AF.High & 0xF0) > 0x90 || Utility.IsBitSet(AF.Low, FLAG_C))
+                        {
+                            AF.High += 0x60;
+                        }
+                    }
+                    if (AF.High == 0)
+                    {
+                        Utility.SetBit(ref AF.Low, FLAG_Z, SBMode.On);
+                    }
+                    else
+                    {
+                        Utility.SetBit(ref AF.Low, FLAG_Z, SBMode.Off);
+                    }
+
+                    CyclesUsed = 1;
+                    break;
+                case(0x28): //JR Z,n
+                    Jumpval = (sbyte)MyCore.MyMemory.Read(++ProgramCounter.Word);
+                    if (Utility.IsBitSet(AF.Low, FLAG_Z))
+                    {
+                        if (Jumpval < 0)
+                        {
+                            ProgramCounter.Word -= (ushort)Math.Abs(Jumpval);
+                        }
+                        else
+                        {
+                            ProgramCounter.Word += (ushort)Math.Abs(Jumpval);
+                        }
+                    }
+                    CyclesUsed = 3;
+                    break;
+                case(0x29): //ADD HL,HL
+                    ADD_R16_R16(ref HL, HL);
+                    CyclesUsed = 2;
+                    break;
+                case(0x2A): //LDI A,(HL)
+                    AF.High = MyCore.MyMemory.Read(HL.Word);
+                    INC_R16(ref HL);
+                    CyclesUsed = 2;
+                    break;
+                case(0x2B): //DEC HL
+                    DEC_R16(ref HL);
+                    CyclesUsed = 2;
+                    break;
+                case(0x2C): //INC L
+                    INC_R8(ref HL.Low);
+                    CyclesUsed = 1;
+                    break;
+                case(0x2D): //DEC L
+                    DEC_R8(ref HL.Low);
+                    CyclesUsed = 1;
+                    break;
+                case(0x2E): //LD L,n
+                    HL.Low = MyCore.MyMemory.Read(++ProgramCounter.Word);
+                    CyclesUsed = 2;
+                    break;
+                case(0x2F): //CPL
+                    AF.High = (byte)(~AF.High);
+                    Utility.SetBit(ref AF.Low, FLAG_N, SBMode.On);
+                    Utility.SetBit(ref AF.Low, FLAG_H, SBMode.On);
+                    CyclesUsed = 1;
+                    break;
             }
             ProgramCounter.Word++;
             return CyclesUsed;
@@ -260,6 +448,30 @@ namespace SharpBoy2.Emulation
             Utility.SetBit(ref AF.Low, FLAG_Z, SBMode.Off);
             Utility.SetBit(ref AF.Low, FLAG_N, SBMode.Off);
             R16.Word = NN;
+        }
+
+        public void INC_R16(ref Register R16)
+        {
+            if (R16.Word == 0xFFFF)
+            {
+                R16.Word = 0;
+            }
+            else
+            {
+                R16.Word++;
+            }
+        }
+
+        public void DEC_R16(ref Register R16)
+        {
+            if (R16.Word == 0)
+            {
+                R16.Word = 0xFFFF;
+            }
+            else
+            {
+                R16.Word--;
+            }
         }
 
         public void INC_R8(ref byte R8)

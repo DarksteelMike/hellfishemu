@@ -27,7 +27,8 @@ namespace SharpBoy2.Emulation
 
         public void Reset()
         {
-
+            MyCPU.Reset();
+            MyMemory.Reset();
         }
     }
 }
