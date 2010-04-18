@@ -128,6 +128,7 @@ namespace SharpBoy2
             // 
             // tbSP
             // 
+            this.tbSP.Enabled = false;
             this.tbSP.Location = new System.Drawing.Point(117, 117);
             this.tbSP.Name = "tbSP";
             this.tbSP.Size = new System.Drawing.Size(62, 20);
@@ -144,6 +145,7 @@ namespace SharpBoy2
             // 
             // tbPC
             // 
+            this.tbPC.Enabled = false;
             this.tbPC.Location = new System.Drawing.Point(26, 117);
             this.tbPC.Name = "tbPC";
             this.tbPC.Size = new System.Drawing.Size(62, 20);
@@ -161,6 +163,7 @@ namespace SharpBoy2
             // cbC
             // 
             this.cbC.AutoSize = true;
+            this.cbC.Enabled = false;
             this.cbC.Location = new System.Drawing.Point(146, 84);
             this.cbC.Name = "cbC";
             this.cbC.Size = new System.Drawing.Size(33, 17);
@@ -171,6 +174,7 @@ namespace SharpBoy2
             // cbH
             // 
             this.cbH.AutoSize = true;
+            this.cbH.Enabled = false;
             this.cbH.Location = new System.Drawing.Point(146, 61);
             this.cbH.Name = "cbH";
             this.cbH.Size = new System.Drawing.Size(34, 17);
@@ -181,6 +185,7 @@ namespace SharpBoy2
             // cbN
             // 
             this.cbN.AutoSize = true;
+            this.cbN.Enabled = false;
             this.cbN.Location = new System.Drawing.Point(146, 38);
             this.cbN.Name = "cbN";
             this.cbN.Size = new System.Drawing.Size(34, 17);
@@ -191,6 +196,7 @@ namespace SharpBoy2
             // cbZ
             // 
             this.cbZ.AutoSize = true;
+            this.cbZ.Enabled = false;
             this.cbZ.Location = new System.Drawing.Point(146, 15);
             this.cbZ.Name = "cbZ";
             this.cbZ.Size = new System.Drawing.Size(33, 17);
@@ -200,6 +206,7 @@ namespace SharpBoy2
             // 
             // tbE
             // 
+            this.tbE.Enabled = false;
             this.tbE.Location = new System.Drawing.Point(95, 65);
             this.tbE.Name = "tbE";
             this.tbE.Size = new System.Drawing.Size(45, 20);
@@ -216,6 +223,7 @@ namespace SharpBoy2
             // 
             // tbC
             // 
+            this.tbC.Enabled = false;
             this.tbC.Location = new System.Drawing.Point(95, 39);
             this.tbC.Name = "tbC";
             this.tbC.Size = new System.Drawing.Size(45, 20);
@@ -232,6 +240,7 @@ namespace SharpBoy2
             // 
             // tbF
             // 
+            this.tbF.Enabled = false;
             this.tbF.Location = new System.Drawing.Point(95, 13);
             this.tbF.Name = "tbF";
             this.tbF.Size = new System.Drawing.Size(45, 20);
@@ -248,6 +257,7 @@ namespace SharpBoy2
             // 
             // tbHL
             // 
+            this.tbHL.Enabled = false;
             this.tbHL.Location = new System.Drawing.Point(26, 91);
             this.tbHL.Name = "tbHL";
             this.tbHL.Size = new System.Drawing.Size(62, 20);
@@ -264,6 +274,7 @@ namespace SharpBoy2
             // 
             // tbD
             // 
+            this.tbD.Enabled = false;
             this.tbD.Location = new System.Drawing.Point(26, 65);
             this.tbD.Name = "tbD";
             this.tbD.Size = new System.Drawing.Size(45, 20);
@@ -280,6 +291,7 @@ namespace SharpBoy2
             // 
             // tbB
             // 
+            this.tbB.Enabled = false;
             this.tbB.Location = new System.Drawing.Point(26, 39);
             this.tbB.Name = "tbB";
             this.tbB.Size = new System.Drawing.Size(45, 20);
@@ -296,6 +308,7 @@ namespace SharpBoy2
             // 
             // tbA
             // 
+            this.tbA.Enabled = false;
             this.tbA.Location = new System.Drawing.Point(26, 13);
             this.tbA.Name = "tbA";
             this.tbA.Size = new System.Drawing.Size(45, 20);
