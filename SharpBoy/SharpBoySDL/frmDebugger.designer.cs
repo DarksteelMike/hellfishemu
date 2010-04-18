@@ -65,6 +65,12 @@ namespace SharpBoy2
             this.bReset = new System.Windows.Forms.Button();
             this.vlbRAM = new VirtualListBox.VListBox();
             this.vlbROM = new VirtualListBox.VListBox();
+            this.lbBreakConditions = new System.Windows.Forms.ListBox();
+            this.tbBreakCondition = new System.Windows.Forms.TextBox();
+            this.bAddBreakCondition = new System.Windows.Forms.Button();
+            this.bRemoveBreakCondition = new System.Windows.Forms.Button();
+            this.bRun = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.grpRegisters.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -432,11 +438,68 @@ namespace SharpBoy2
             this.vlbROM.TabIndex = 0;
             this.vlbROM.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.vlbROM_DrawItem);
             // 
+            // lbBreakConditions
+            // 
+            this.lbBreakConditions.FormattingEnabled = true;
+            this.lbBreakConditions.Location = new System.Drawing.Point(191, 344);
+            this.lbBreakConditions.Name = "lbBreakConditions";
+            this.lbBreakConditions.Size = new System.Drawing.Size(402, 134);
+            this.lbBreakConditions.TabIndex = 15;
+            // 
+            // tbBreakCondition
+            // 
+            this.tbBreakCondition.Location = new System.Drawing.Point(191, 318);
+            this.tbBreakCondition.Name = "tbBreakCondition";
+            this.tbBreakCondition.Size = new System.Drawing.Size(170, 20);
+            this.tbBreakCondition.TabIndex = 16;
+            // 
+            // bAddBreakCondition
+            // 
+            this.bAddBreakCondition.Location = new System.Drawing.Point(367, 315);
+            this.bAddBreakCondition.Name = "bAddBreakCondition";
+            this.bAddBreakCondition.Size = new System.Drawing.Size(75, 23);
+            this.bAddBreakCondition.TabIndex = 17;
+            this.bAddBreakCondition.Text = "Add";
+            this.bAddBreakCondition.UseVisualStyleBackColor = true;
+            // 
+            // bRemoveBreakCondition
+            // 
+            this.bRemoveBreakCondition.Location = new System.Drawing.Point(448, 315);
+            this.bRemoveBreakCondition.Name = "bRemoveBreakCondition";
+            this.bRemoveBreakCondition.Size = new System.Drawing.Size(75, 23);
+            this.bRemoveBreakCondition.TabIndex = 18;
+            this.bRemoveBreakCondition.Text = "Remove";
+            this.bRemoveBreakCondition.UseVisualStyleBackColor = true;
+            // 
+            // bRun
+            // 
+            this.bRun.Location = new System.Drawing.Point(353, 255);
+            this.bRun.Name = "bRun";
+            this.bRun.Size = new System.Drawing.Size(75, 23);
+            this.bRun.TabIndex = 19;
+            this.bRun.Text = "Run";
+            this.bRun.UseVisualStyleBackColor = true;
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(434, 255);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 20;
+            this.button2.Text = "Stop";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
             // frmDebugger
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 486);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.bRun);
+            this.Controls.Add(this.bRemoveBreakCondition);
+            this.Controls.Add(this.bAddBreakCondition);
+            this.Controls.Add(this.tbBreakCondition);
+            this.Controls.Add(this.lbBreakConditions);
             this.Controls.Add(this.bReset);
             this.Controls.Add(this.bStep);
             this.Controls.Add(this.lblCyclesRun);
@@ -500,5 +563,11 @@ namespace SharpBoy2
         private System.Windows.Forms.Label lblUICyclesRun;
         private System.Windows.Forms.Button bStep;
         private System.Windows.Forms.Button bReset;
+        private System.Windows.Forms.ListBox lbBreakConditions;
+        private System.Windows.Forms.TextBox tbBreakCondition;
+        private System.Windows.Forms.Button bAddBreakCondition;
+        private System.Windows.Forms.Button bRemoveBreakCondition;
+        private System.Windows.Forms.Button bRun;
+        private System.Windows.Forms.Button button2;
     }
 }
