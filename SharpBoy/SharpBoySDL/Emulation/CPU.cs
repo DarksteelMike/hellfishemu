@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
-namespace SharpBoy2.Emulation
+namespace SharpBoy.Emulation
 {
     public class CPU
     {
@@ -32,9 +32,11 @@ namespace SharpBoy2.Emulation
         public Register ProgramCounter;
 
         public Core MyCore;
+        public bool EmulateBIOS;
 
-        public CPU(Core C)
+        public CPU(Core C,bool UseBIOS)
         {
+            EmulateBIOS = UseBIOS;
             AF = new Register();
             BC = new Register();
             DE = new Register();
@@ -63,9 +65,12 @@ namespace SharpBoy2.Emulation
             DE.Word = 0x00D8;
             HL.Word = 0x014D;
             StackPointer.Word = 0xFFFE;
-            ProgramCounter.Word = 0;
 
-            Array.Copy(BIOS, 0, MyCore.MyMemory.GameBoyRAM, 0, BIOS.Length);
+            if (EmulateBIOS)
+            {
+                ProgramCounter.Word = 0;
+                Array.Copy(BIOS, 0, MyCore.MyMemory.GameBoyRAM, 0, BIOS.Length);
+            }
 
             DIV_Counter = 256;
             TIMA_Counter = 1024;

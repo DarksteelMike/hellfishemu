@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace SharpBoy2
+namespace SharpBoy
 {
     public partial class frmMain : Form
     {
@@ -39,7 +39,7 @@ namespace SharpBoy2
                     fs.Read(tmpbuf, 0, (int)fs.Length);
                     fs.Close();
                 }
-                MyCore = new SharpBoy2.Emulation.Core();
+                MyCore = new Emulation.Core(scDisplay);
                 MyCore.LoadROM(tmpbuf);
                 MyCore.Reset();
                 debugToolStripMenuItem.Enabled = true;

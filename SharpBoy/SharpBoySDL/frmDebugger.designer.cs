@@ -1,4 +1,4 @@
-namespace SharpBoy2
+namespace SharpBoy
 {
     partial class frmDebugger
     {

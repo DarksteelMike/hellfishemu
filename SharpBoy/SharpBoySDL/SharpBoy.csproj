@@ -39,6 +39,7 @@
   <ItemGroup>
     <Compile Include="Emulation\Core.cs" />
     <Compile Include="Emulation\CPU.cs" />
+    <Compile Include="Emulation\Display.cs" />
     <Compile Include="Emulation\Memory.cs" />
     <Compile Include="Emulation\MemoryMappers\MemoryMapperBase.cs" />
     <Compile Include="Emulation\MemoryMappers\MemoryMapper_MBC1.cs" />

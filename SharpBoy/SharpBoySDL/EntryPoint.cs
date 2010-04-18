@@ -3,7 +3,7 @@ using System;
 using SdlDotNet.Core;
 using SdlDotNet.Graphics;
 
-namespace SharpBoySDL
+namespace SharpBoy
 {
     public class SharpBoy
     {
@@ -19,7 +19,7 @@ namespace SharpBoySDL
         public SharpBoy()
         {
             
-            SharpBoy2.frmMain MainBoyo = new SharpBoy2.frmMain();
+            frmMain MainBoyo = new frmMain();
             MainBoyo.Show();
             
             //Video.SetVideoMode(320, 288,32,false,false,false,false,true);

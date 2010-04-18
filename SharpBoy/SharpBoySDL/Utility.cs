@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SharpBoy2
+namespace SharpBoy
 {
     public enum SBMode { On, Off, Toggle };
     class Utility

@@ -6,14 +6,14 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace SharpBoy2
+namespace SharpBoy
 {
     public partial class frmDebugger : Form
     {
         private Emulation.Core MyCore;
         private System.Drawing.Graphics SpecDrawing;
 
-        public frmDebugger(SharpBoy2.Emulation.Core C)
+        public frmDebugger(Emulation.Core C)
         {
             SpecDrawing = System.Drawing.Graphics.FromHwnd(this.Handle);           
 

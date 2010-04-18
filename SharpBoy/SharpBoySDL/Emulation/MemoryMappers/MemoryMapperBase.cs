@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SharpBoy2.Emulation.MemoryMappers
+namespace SharpBoy.Emulation.MemoryMappers
 {
     public abstract class MemoryMapperBase
     {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SharpBoy2.Emulation
+namespace SharpBoy.Emulation
 {
     public class Memory
     {
@@ -100,6 +100,16 @@ namespace SharpBoy2.Emulation
         public void Write(ushort Address, byte Data)
         {
 	        bool MasterShouldWrite = true;
+
+            //ECHO RAM
+            if(Address >= 0xC000 && Address <= 0xDDFF)
+            {
+                GameBoyRAM[Address + 0x2000] = Data;
+            }
+            if (Address >= 0xE000 && Address <= 0xFDFF)
+            {
+                GameBoyRAM[Address - 0x2000] = Data;
+            }
 
 	        if(Address == 0xFF0F)
 	        {

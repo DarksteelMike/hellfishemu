@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using System.Text;
 using SdlDotNet.Input;
 
-namespace SharpBoy2.Emulation
+namespace SharpBoy.Emulation
 {
     public class Core
     {
         public Memory MyMemory;
         public CPU MyCPU;
+        public Display MyDisplay;
 
         private Key[] DesignatedKeys;
 
-        public Core()
+        public Core(SdlDotNet.Windows.SurfaceControl SC)
         {
             MyMemory = new Memory(this);
-            MyCPU = new CPU(this);
+            MyCPU = new CPU(this,false);
+            MyDisplay = new Display(this,SC);
             SdlDotNet.Core.Events.KeyboardDown += new EventHandler<KeyboardEventArgs>(Events_KeyboardDown);
             DesignatedKeys = new Key[] { Key.RightArrow, Key.LeftArrow, Key.UpArrow, Key.DownArrow, Key.A, Key.S, Key.R, Key.T };
         }
@@ -26,6 +28,7 @@ namespace SharpBoy2.Emulation
             {
                 if (k == e.Key)
                 {
+                    System.Windows.Forms.MessageBox.Show("AM I INTERRUPTING YOU??");
                     Utility.SetBit(ref MyMemory.GameBoyRAM[0xFF0F], 4, SBMode.On); //Request joypad interrupt
                     return;
                 }
