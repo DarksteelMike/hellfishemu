@@ -42,12 +42,16 @@ namespace SharpBoy
                 MyCore = new Emulation.Core(scDisplay);
                 MyCore.LoadROM(tmpbuf);
                 MyCore.Reset();
+                this.KeyDown += new KeyEventHandler(MyCore.frmMain_KeyDown);
+                this.KeyUp += new KeyEventHandler(MyCore.frmMain_KeyUp);
                 debugToolStripMenuItem.Enabled = true;
                 resetAndDebugToolStripMenuItem.Enabled = true;
                 Debugger = new frmDebugger(MyCore);
                 Debugger.Disposed += new EventHandler(Debugger_Disposed);
             }
         }
+
+        
 
         void Debugger_Disposed(object sender, EventArgs e)
         {

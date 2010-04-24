@@ -75,6 +75,10 @@ namespace SharpBoy.Emulation
                 ProgramCounter.Word = 0;
                 Array.Copy(BIOS, 0, MyCore.MyMemory.GameBoyRAM, 0, BIOS.Length);
             }
+            else
+            {
+                ProgramCounter.Word = 0x100;
+            }
 
             DIV_Counter = 256;
             TIMA_Counter = 1024;
@@ -138,7 +142,7 @@ namespace SharpBoy.Emulation
                     CyclesUsed = 1;
                     break;
                 case (0x05): //DEC B 
-                    DEC_R8(ref BC.Low);
+                    DEC_R8(ref BC.High);
                     CyclesUsed = 1;
                     break;
                 case (0x06): //LD B,n 
@@ -1083,7 +1087,7 @@ namespace SharpBoy.Emulation
                     CyclesUsed = 3;
                     break;
                 case (0xC3): //JP nn 
-                    ProgramCounter.Word = MyCore.MyMemory.ReadWord(++ProgramCounter.Word);
+                    ProgramCounter.Word = (ushort)(MyCore.MyMemory.ReadWord(++ProgramCounter.Word)-1);
                     CyclesUsed = 4;
                     break;
                 case (0xC4): //CALL NZ,nn 
@@ -2634,6 +2638,7 @@ namespace SharpBoy.Emulation
 
         public void DEC_R8(ref byte R8)
         {
+            AF.Low = 0;
             if (R8 == 0)
             {
                 Utility.SetBit(ref AF.Low, FLAG_Z, SBMode.Off);

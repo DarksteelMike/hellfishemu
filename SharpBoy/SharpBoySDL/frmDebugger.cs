@@ -33,9 +33,9 @@ namespace SharpBoy
             tbD.Text = "0x" + Convert.ToString(MyCore.MyCPU.DE.High, 16).PadLeft(2, '0').ToUpper();
             tbE.Text = "0x" + Convert.ToString(MyCore.MyCPU.DE.Low, 16).PadLeft(2, '0').ToUpper();
             tbF.Text = "0x" + Convert.ToString(MyCore.MyCPU.AF.Low, 16).PadLeft(2, '0').ToUpper();
-            tbHL.Text = "0x" + Convert.ToString(MyCore.MyCPU.HL.Word,16).PadLeft(2,'0');
-            tbPC.Text = "0x" + Convert.ToString(MyCore.MyCPU.ProgramCounter.Word, 16).PadLeft(2, '0').ToUpper();
-            tbSP.Text = "0x" + Convert.ToString(MyCore.MyCPU.StackPointer.Word, 16).PadLeft(2, '0').ToUpper();
+            tbHL.Text = "0x" + Convert.ToString(MyCore.MyCPU.HL.Word, 16).PadLeft(2, '0').ToUpper(); ;
+            tbPC.Text = "0x" + Convert.ToString(MyCore.MyCPU.ProgramCounter.Word, 16).PadLeft(4, '0').ToUpper();
+            tbSP.Text = "0x" + Convert.ToString(MyCore.MyCPU.StackPointer.Word, 16).PadLeft(4, '0').ToUpper();
 
             lblTIMAUpdate.Text = MyCore.MyCPU.TIMA_Counter.ToString();
             lblDIVUpdate.Text = MyCore.MyCPU.DIV_Counter.ToString();
@@ -62,8 +62,36 @@ namespace SharpBoy
         {
             if (e.Index != -1)
             {
-                string output = "$" + Convert.ToString(MyCore.MyMemory.ROM[e.Index + 1], 16).PadLeft(2, '0').ToUpper() + "(" + TranslateOpcode(MyCore.MyMemory.ROM[e.Index], (e.Index < (MyCore.MyMemory.ROM.Length - 1)) ? MyCore.MyMemory.ROM[e.Index + 1] : MyCore.MyMemory.ROM[e.Index]) + ")";
-                vlbROM.DefaultDrawItem(e, output);
+                //Construct output
+                //Address
+                string output = "$" + Convert.ToString(e.Index, 16).PadLeft(4, '0').ToUpper() + ": ";
+
+                //Content
+                output += Convert.ToString(MyCore.MyMemory.GameBoyRAM[e.Index], 16).PadLeft(2, '0').ToUpper();
+
+                //Disassembly
+                if (e.Index != 0)
+                {
+                    if (e.Index != 1) //2 params
+                    {
+                        if (TakesParameters(MyCore.MyMemory.GameBoyRAM[e.Index - 1]) == 0 && TakesParameters(MyCore.MyMemory.GameBoyRAM[e.Index - 2]) < 2)
+                        {
+                            output += "(" + TranslateOpcode(MyCore.MyMemory.GameBoyRAM[e.Index], (e.Index < 0xFFFF) ? MyCore.MyMemory.GameBoyRAM[e.Index + 1] : MyCore.MyMemory.GameBoyRAM[e.Index]) + ")";
+                        }
+                    }
+                    else//1 param
+                    {
+                        if (TakesParameters(MyCore.MyMemory.GameBoyRAM[e.Index - 1]) == 0)
+                        {
+                            output += "(" + TranslateOpcode(MyCore.MyMemory.GameBoyRAM[e.Index], (e.Index < 0xFFFF) ? MyCore.MyMemory.GameBoyRAM[e.Index + 1] : MyCore.MyMemory.GameBoyRAM[e.Index]) + ")";
+                        }
+                    }
+                }
+                else //0 params
+                {
+                    output += "(" + TranslateOpcode(MyCore.MyMemory.GameBoyRAM[e.Index], (e.Index < 0xFFFF) ? MyCore.MyMemory.GameBoyRAM[e.Index + 1] : MyCore.MyMemory.GameBoyRAM[e.Index]) + ")";
+                }
+                vlbRAM.DefaultDrawItem(e, output);
             }
         }
 
@@ -125,6 +153,8 @@ namespace SharpBoy
             switch (Opcode)
             {
                 case (0x01): ret = 2; break;
+                case (0x06): ret = 1; break;
+                case (0x08): ret = 2; break;
                 case (0x0E): ret = 1; break;
 
                 case (0x11): ret = 2; break;
@@ -132,7 +162,9 @@ namespace SharpBoy
                 case (0x18): ret = 1; break;
                 case (0x1E): ret = 1; break;
 
+                case (0x20): ret = 1; break;
                 case (0x21): ret = 2; break;
+                case (0x26): ret = 1; break;
                 case (0x28): ret = 1; break;
                 case (0x2E): ret = 1; break;
 

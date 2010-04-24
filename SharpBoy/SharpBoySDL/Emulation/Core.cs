@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using SdlDotNet.Input;
-
+using System.Windows.Forms;
 namespace SharpBoy.Emulation
 {
     public class Core
@@ -11,28 +10,54 @@ namespace SharpBoy.Emulation
         public CPU MyCPU;
         public Display MyDisplay;
 
-        private Key[] DesignatedKeys;
+        private Keys[] DesignatedKeys;
 
         public Core(SdlDotNet.Windows.SurfaceControl SC)
         {
             MyMemory = new Memory(this);
             MyCPU = new CPU(this,false);
             MyDisplay = new Display(this,SC);
-            SdlDotNet.Core.Events.KeyboardDown += new EventHandler<KeyboardEventArgs>(Events_KeyboardDown);
-            DesignatedKeys = new Key[] { Key.RightArrow, Key.LeftArrow, Key.UpArrow, Key.DownArrow, Key.A, Key.S, Key.R, Key.T };
+            DesignatedKeys = new Keys[] { Keys.Right, Keys.Left, Keys.Up, Keys.Down, Keys.A, Keys.S, Keys.R, Keys.T };
         }
 
-        void Events_KeyboardDown(object sender, KeyboardEventArgs e)
+        public void frmMain_KeyDown(object sender, KeyEventArgs e)
         {
-            foreach (Key k in DesignatedKeys)
+            for (byte i = 0; i < DesignatedKeys.Length; i++)
             {
-                if (k == e.Key)
+                if (DesignatedKeys[i] == e.KeyCode)
                 {
-                    System.Windows.Forms.MessageBox.Show("AM I INTERRUPTING YOU??");
-                    Utility.SetBit(ref MyMemory.GameBoyRAM[0xFF0F], 4, SBMode.On); //Request joypad interrupt
-                    return;
+                    if (i < 4 && Utility.IsBitSet(MyMemory.Read(0xFF00), 5)) //Directions
+                    {
+                        Utility.SetBit(ref MyMemory.GameBoyRAM[0xFF00], i, SBMode.On);
+                        return;
+                    }
+                    else if (i >= 4 && Utility.IsBitSet(MyMemory.Read(0xFF00), 4)) //Buttons
+                    {
+                        Utility.SetBit(ref MyMemory.GameBoyRAM[0xFF00], (byte)(i-4), SBMode.On);
+                        return;
+                    }
                 }
-            }            
+            }
+        }
+
+        public void frmMain_KeyUp(object sender, KeyEventArgs e)
+        {
+            for (byte i = 0; i < DesignatedKeys.Length; i++)
+            {
+                if (DesignatedKeys[i] == e.KeyCode)
+                {
+                    if (i < 4 && Utility.IsBitSet(MyMemory.Read(0xFF00), 5)) //Directions
+                    {
+                        Utility.SetBit(ref MyMemory.GameBoyRAM[0xFF00], i, SBMode.Off);
+                        return;
+                    }
+                    else if (i >= 4 && Utility.IsBitSet(MyMemory.Read(0xFF00), 4)) //Buttons
+                    {
+                        Utility.SetBit(ref MyMemory.GameBoyRAM[0xFF00], (byte)(i - 4), SBMode.Off);
+                        return;
+                    }
+                }
+            }
         }
 
         public void LoadROM(byte[] R)
@@ -40,25 +65,6 @@ namespace SharpBoy.Emulation
             MyMemory.LoadROM(R);
         }
 
-        public byte MakeInputByte()
-        {
-            int res = 0;
-            if (Utility.IsBitSet(MyMemory.Read(0xFF00), 4)) //Directions
-            {
-                res |= SdlDotNet.Input.Keyboard.IsKeyPressed(DesignatedKeys[0]) ? 0 : 1; //Right
-                res |= SdlDotNet.Input.Keyboard.IsKeyPressed(DesignatedKeys[1]) ? 0 : 2; //Left
-                res |= SdlDotNet.Input.Keyboard.IsKeyPressed(DesignatedKeys[2]) ? 0 : 4; //Up
-                res |= SdlDotNet.Input.Keyboard.IsKeyPressed(DesignatedKeys[3]) ? 0 : 8; //Down
-            }
-            else if (Utility.IsBitSet(MyMemory.Read(0xFF00), 5)) //Buttons
-            {
-                res |= SdlDotNet.Input.Keyboard.IsKeyPressed(DesignatedKeys[4]) ? 0 : 1; //A
-                res |= SdlDotNet.Input.Keyboard.IsKeyPressed(DesignatedKeys[5]) ? 0 : 2; //B
-                res |= SdlDotNet.Input.Keyboard.IsKeyPressed(DesignatedKeys[6]) ? 0 : 4; //Select
-                res |= SdlDotNet.Input.Keyboard.IsKeyPressed(DesignatedKeys[7]) ? 0 : 8; //Start
-            }
-            return (byte)res;
-        }
 
         public void Reset()
         {

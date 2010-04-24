@@ -79,10 +79,6 @@ namespace SharpBoy.Emulation
 
         public byte Read(ushort Address)
         {
-            if (Address == 0xFF00)
-            {
-                return MyCore.MakeInputByte();
-            }
             if (Mapper.ReadAttempted(ref Address))
             {
                 return GameBoyRAM[Address];
@@ -94,7 +90,7 @@ namespace SharpBoy.Emulation
         }
         public ushort ReadWord(ushort Address)
         {
-            return (ushort)((Read(Address) << 8) | Read((ushort)(Address + 1)));
+            return (ushort)(Read(Address) | Read((ushort)(Address + 1)) << 8);
         }
 
         public void Write(ushort Address, byte Data)
